@@ -1,0 +1,49 @@
+{% extends "base/base.html" %}
+{% block title %}Sales History{% endblock %}
+{% block page_title %}Sales History{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'sale_create' %}" class="btn btn-primary">+ New Sale</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>RECEIPT #</th><th>BRANCH</th><th>CASHIER</th><th>CUSTOMER</th>
+        <th>ITEMS</th><th>TOTAL</th><th>PAYMENT</th><th>STATUS</th><th>DATE</th><th></th>
+      </tr></thead>
+      <tbody>
+      {% for sale in sales %}
+      <tr>
+        <td style="font-family:'DM Mono',monospace;color:var(--gold);">
+          <a href="{% url 'sale_detail' sale.pk %}" style="color:var(--gold);">{{ sale.receipt_no }}</a>
+        </td>
+        <td>{{ sale.branch.name }}</td>
+        <td style="color:var(--muted);">{{ sale.cashier.username }}</td>
+        <td style="color:var(--muted);">{{ sale.customer_name|default:"—" }}</td>
+        <td style="font-family:'DM Mono',monospace;">{{ sale.items.count }}</td>
+        <td style="font-weight:700;">₦{{ sale.grand_total|floatformat:0 }}</td>
+        <td>
+          <span class="badge badge-gray">{{ sale.get_payment_method_display }}</span>
+        </td>
+        <td>
+          {% if sale.status == 'completed' %}<span class="badge badge-green">Completed</span>
+          {% elif sale.status == 'refunded' %}<span class="badge badge-gold">Refunded</span>
+          {% else %}<span class="badge badge-red">Voided</span>{% endif %}
+        </td>
+        <td style="color:var(--muted);font-size:12px;">{{ sale.created_at|date:"d M Y H:i" }}</td>
+        <td>
+          <a href="{% url 'sale_receipt' sale.pk %}" class="btn btn-secondary btn-sm">Receipt</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="10" style="color:var(--muted);text-align:center;padding:32px;">
+        No sales yet. <a href="{% url 'sale_create' %}" style="color:var(--gold);">Make the first sale →</a>
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% include "base/pagination.html" with page_obj=sales %}
+{% endblock %}

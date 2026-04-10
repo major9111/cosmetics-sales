@@ -1,0 +1,39 @@
+{% extends "base/base.html" %}
+{% block title %}New Transfer{% endblock %}
+{% block page_title %}Request Stock Transfer{% endblock %}
+{% block content %}
+<div class="card" style="max-width:500px;">
+  <div class="card-title">Move stock between branches</div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="form-label">PRODUCT</label>
+      <select class="form-control" name="product">
+        {% for p in products %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="form-group">
+        <label class="form-label">FROM BRANCH</label>
+        <select class="form-control" name="from_branch">
+          {% for b in branches %}<option value="{{ b.id }}">{{ b.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">TO BRANCH</label>
+        <select class="form-control" name="to_branch">
+          {% for b in branches %}<option value="{{ b.id }}">{{ b.name }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">QUANTITY</label>
+      <input class="form-control" name="quantity" type="number" min="1" placeholder="e.g. 10" required/>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button type="submit" class="btn btn-primary">Request Transfer</button>
+      <a href="{% url 'transfer_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

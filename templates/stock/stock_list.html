@@ -1,0 +1,47 @@
+{% extends "base/base.html" %}
+{% block title %}Stock Levels{% endblock %}
+{% block page_title %}Stock Levels{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'receipt_scanner' %}" class="btn btn-primary">🧾 Scan Receipt</a>
+  <a href="{% url 'transfer_create' %}" class="btn btn-secondary">⇄ Transfer</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>PRODUCT</th><th>BRANCH</th><th>QTY</th><th>STATUS</th><th>THRESHOLD</th><th>LAST UPDATED</th><th></th>
+      </tr></thead>
+      <tbody>
+      {% for s in stocks %}
+      <tr>
+        <td>
+          <div style="font-weight:600;">{{ s.product.name }}</div>
+          <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">{{ s.product.sku }}</div>
+        </td>
+        <td>{{ s.branch.name }}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;
+          color:{% if s.is_out %}#e84c7a{% elif s.is_low %}var(--gold){% else %}var(--sage2){% endif %};">
+          {{ s.quantity }}
+        </td>
+        <td>
+          {% if s.is_out %}<span class="badge badge-red">Out of Stock</span>
+          {% elif s.is_low %}<span class="badge badge-gold">Low Stock</span>
+          {% else %}<span class="badge badge-green">OK</span>{% endif %}
+        </td>
+        <td style="color:var(--muted);">{{ s.low_stock_threshold }}</td>
+        <td style="color:var(--muted);font-size:12px;">{{ s.updated_at|date:"d M Y H:i" }}</td>
+        <td>
+          <a href="{% url 'restock_form' s.product.pk %}" class="btn btn-secondary btn-sm">+ Restock</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" style="color:var(--muted);text-align:center;padding:32px;">
+        No stock records yet. Use the <a href="{% url 'receipt_scanner' %}" style="color:var(--gold);">AI Receipt Scanner</a> to add stock.
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

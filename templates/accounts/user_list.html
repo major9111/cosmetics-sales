@@ -1,0 +1,41 @@
+{% extends "base/base.html" %}
+{% block title %}Staff{% endblock %}
+{% block page_title %}Staff & Users{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'user_create' %}" class="btn btn-primary">+ Add Staff</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>NAME</th><th>USERNAME</th><th>ROLE</th><th>BRANCH</th><th>PHONE</th><th>STATUS</th>
+      </tr></thead>
+      <tbody>
+      {% for u in users %}
+      <tr>
+        <td><strong>{{ u.get_full_name|default:"—" }}</strong></td>
+        <td style="font-family:'DM Mono',monospace;color:var(--muted);">{{ u.username }}</td>
+        <td>
+          <span class="badge
+            {% if u.role == 'super_admin' %}badge-gold
+            {% elif u.role == 'branch_manager' %}badge-green
+            {% else %}badge-gray{% endif %}">
+            {{ u.get_role_display }}
+          </span>
+        </td>
+        <td>{{ u.branch.name|default:"—" }}</td>
+        <td style="color:var(--muted);">{{ u.phone|default:"—" }}</td>
+        <td>
+          {% if u.is_active %}<span class="badge badge-green">Active</span>
+          {% else %}<span class="badge badge-red">Inactive</span>{% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:32px;">No users yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

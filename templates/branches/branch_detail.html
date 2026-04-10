@@ -1,0 +1,91 @@
+{% extends "base/base.html" %}
+{% block title %}{{ branch.name }}{% endblock %}
+{% block page_title %}{{ branch.name }}{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'branch_list' %}" class="btn btn-secondary">← Branches</a>
+{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+  <div class="card">
+    <div class="card-title">Branch Info</div>
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Name</span><strong>{{ branch.name }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Location</span><span>{{ branch.location }}</span>
+      </div>
+      {% if branch.phone %}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Phone</span><span>{{ branch.phone }}</span>
+      </div>
+      {% endif %}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Type</span>
+        <span>{% if branch.is_main %}<span class="badge badge-gold">Main Store</span>{% else %}Branch{% endif %}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;">
+        <span style="color:var(--muted);">Status</span>
+        <span>{% if branch.is_active %}<span class="badge badge-green">Active</span>{% else %}<span class="badge badge-red">Inactive</span>{% endif %}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Quick Stats</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;margin-bottom:8px;">TOTAL SALES</div>
+        <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--gold);">₦{{ branch.total_sales|floatformat:0 }}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;margin-bottom:8px;">STOCK VALUE</div>
+        <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--sage2);">₦{{ branch.total_stock_value|floatformat:0 }}</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;">
+      <div class="card-title" style="font-size:13px;">Staff</div>
+      {% for staff in branch.staff.all %}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span>{{ staff.get_full_name|default:staff.username }}</span>
+        <span class="badge badge-gray">{{ staff.get_role_display }}</span>
+      </div>
+      {% empty %}
+      <p style="color:var(--muted);font-size:13px;">No staff assigned yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Stock at this branch -->
+<div class="card" style="margin-top:20px;">
+  <div class="card-title" style="display:flex;justify-content:space-between;">
+    Stock at {{ branch.name }}
+    <a href="{% url 'receipt_scanner' %}" class="btn btn-primary btn-sm">🧾 Scan Receipt</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>PRODUCT</th><th>QTY</th><th>STATUS</th><th></th></tr></thead>
+      <tbody>
+      {% for s in branch.stocks.all %}
+      <tr>
+        <td><strong>{{ s.product.name }}</strong></td>
+        <td style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;
+          color:{% if s.is_out %}#e84c7a{% elif s.is_low %}var(--gold){% else %}var(--sage2){% endif %};">
+          {{ s.quantity }}
+        </td>
+        <td>{% if s.is_out %}<span class="badge badge-red">Out</span>
+            {% elif s.is_low %}<span class="badge badge-gold">Low</span>
+            {% else %}<span class="badge badge-green">OK</span>{% endif %}
+        </td>
+        <td><a href="{% url 'restock_form' s.product.pk %}" class="btn btn-secondary btn-sm">+ Restock</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" style="color:var(--muted);text-align:center;padding:20px;">No stock yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

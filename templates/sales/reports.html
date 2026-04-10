@@ -1,0 +1,201 @@
+{% extends "base/base.html" %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+
+{% block extra_head %}
+<style>
+.report-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:900px){ .report-grid{ grid-template-columns:1fr; } }
+.stat-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 14px; border-radius:99px;
+  background:rgba(200,151,58,0.1); border:1px solid rgba(200,151,58,0.2);
+  font-size:12px; color:var(--gold); font-weight:600;
+}
+.days-filter { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.days-btn {
+  padding:6px 16px; border-radius:99px; border:1.5px solid var(--border);
+  background:var(--bg3); color:var(--muted); font-size:12px; cursor:pointer;
+  transition:all 0.15s; text-decoration:none;
+}
+.days-btn.active, .days-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,151,58,0.08); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Period filter -->
+<div class="days-filter">
+  <span style="font-size:13px;color:var(--muted);align-self:center;">Period:</span>
+  <a href="?days=7"  class="days-btn {% if days == 7 %}active{% endif %}">7 days</a>
+  <a href="?days=14" class="days-btn {% if days == 14 %}active{% endif %}">14 days</a>
+  <a href="?days=30" class="days-btn {% if days == 30 %}active{% endif %}">30 days</a>
+  <a href="?days=90" class="days-btn {% if days == 90 %}active{% endif %}">90 days</a>
+</div>
+
+<!-- Summary KPIs -->
+<div class="kpi-grid" style="margin-bottom:24px;">
+  <div class="kpi">
+    <div class="kpi-label">TOTAL REVENUE</div>
+    <div class="kpi-value">₦{{ revenue|floatformat:0 }}</div>
+    <div class="kpi-sub">Last {{ days }} days</div>
+    <div class="kpi-icon">💰</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">TOTAL PROFIT</div>
+    <div class="kpi-value" style="color:var(--sage2);">₦{{ profit|floatformat:0 }}</div>
+    <div class="kpi-sub">Last {{ days }} days</div>
+    <div class="kpi-icon">📈</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">LOW STOCK ITEMS</div>
+    <div class="kpi-value" style="color:{% if low_stock %}var(--gold){% else %}var(--sage2){% endif %};">
+      {{ low_stock|length }}
+    </div>
+    <div class="kpi-sub">Across all branches</div>
+    <div class="kpi-icon">⚠</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">TOP PRODUCT</div>
+    <div class="kpi-value" style="font-size:16px;">
+      {% with top_products|first as tp %}{{ tp.product__name|truncatechars:18|default:"—" }}{% endwith %}
+    </div>
+    <div class="kpi-sub">{% with top_products|first as tp %}{{ tp.qty_sold|default:0 }} units sold{% endwith %}</div>
+    <div class="kpi-icon">⭐</div>
+  </div>
+</div>
+
+<div class="report-grid">
+  <!-- Daily Sales Trend -->
+  <div class="card" style="grid-column:1/-1;">
+    <div class="card-title">Daily Sales Trend — Last {{ days }} Days</div>
+    <canvas id="trendChart" height="100"></canvas>
+  </div>
+
+  <!-- Branch comparison (admin only) -->
+  {% if user.is_super_admin %}
+  <div class="card">
+    <div class="card-title">Branch Revenue Comparison</div>
+    <canvas id="branchChart" height="200"></canvas>
+  </div>
+  {% endif %}
+
+  <!-- Top Products -->
+  <div class="card">
+    <div class="card-title">Top Selling Products</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>PRODUCT</th><th>QTY SOLD</th><th>REVENUE</th></tr></thead>
+        <tbody>
+        {% for p in top_products %}
+        <tr>
+          <td style="color:var(--muted);">{{ forloop.counter }}</td>
+          <td><strong>{{ p.product__name }}</strong></td>
+          <td style="font-family:'DM Mono',monospace;color:var(--sage2);">{{ p.qty_sold }}</td>
+          <td style="color:var(--gold);">₦{{ p.revenue|floatformat:0 }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="color:var(--muted);text-align:center;">No sales data yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Low stock -->
+  {% if low_stock %}
+  <div class="card">
+    <div class="card-title" style="color:var(--gold);">⚠ Low Stock Alert</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>PRODUCT</th><th>BRANCH</th><th>QTY</th></tr></thead>
+        <tbody>
+        {% for s in low_stock %}
+        <tr>
+          <td>{{ s.product.name }}</td>
+          <td style="color:var(--muted);">{{ s.branch.name }}</td>
+          <td style="font-family:'DM Mono',monospace;color:{% if s.is_out %}#e84c7a{% else %}var(--gold){% endif %};font-weight:700;">
+            {{ s.quantity }}
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;">
+      <a href="{% url 'receipt_scanner' %}" class="btn btn-primary btn-sm">🧾 Scan Receipt to Restock</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Daily trend chart
+const trendData = {{ daily_trend|safe }};
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: {
+    labels: trendData.map(d => d.date),
+    datasets: [{
+      label: 'Revenue (₦)',
+      data: trendData.map(d => d.total),
+      borderColor: '#c8973a',
+      backgroundColor: 'rgba(200,151,58,0.08)',
+      borderWidth: 2,
+      pointBackgroundColor: '#c8973a',
+      pointRadius: 3,
+      fill: true,
+      tension: 0.4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#252838' }, ticks: { color: '#8b8fa8', font: { size: 10 }, maxTicksLimit: 10 } },
+      y: { grid: { color: '#252838' }, ticks: { color: '#8b8fa8', font: { size: 10 } } }
+    }
+  }
+});
+
+{% if user.is_super_admin %}
+const branchData = {{ branch_comparison|safe }};
+{% if branch_comparison != '[]' %}
+new Chart(document.getElementById('branchChart'), {
+  type: 'bar',
+  data: {
+    labels: branchData.map(b => b.branch),
+    datasets: [
+      {
+        label: 'Revenue',
+        data: branchData.map(b => b.revenue),
+        backgroundColor: 'rgba(200,151,58,0.5)',
+        borderColor: '#c8973a',
+        borderWidth: 1,
+        borderRadius: 6,
+      },
+      {
+        label: 'Profit',
+        data: branchData.map(b => b.profit),
+        backgroundColor: 'rgba(61,107,82,0.5)',
+        borderColor: '#3d6b52',
+        borderWidth: 1,
+        borderRadius: 6,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#8b8fa8', font: { size: 11 } } } },
+    scales: {
+      x: { grid: { color: '#252838' }, ticks: { color: '#8b8fa8' } },
+      y: { grid: { color: '#252838' }, ticks: { color: '#8b8fa8' } }
+    }
+  }
+});
+{% endif %}
+{% endif %}
+</script>
+{% endblock %}

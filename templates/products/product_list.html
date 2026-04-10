@@ -1,0 +1,47 @@
+{% extends "base/base.html" %}
+{% block title %}Products{% endblock %}
+{% block page_title %}Products{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'product_create' %}" class="btn btn-primary">+ Add Product</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" style="display:flex;gap:10px;margin-bottom:16px;">
+    <input class="form-control" name="q" value="{{ q }}" placeholder="Search products..." style="max-width:300px;"/>
+    <button type="submit" class="btn btn-secondary">Search</button>
+  </form>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>PRODUCT</th><th>SKU</th><th>BRAND</th><th>CATEGORY</th>
+        <th>COST</th><th>PRICE</th><th>MARGIN</th><th>STOCK</th><th></th>
+      </tr></thead>
+      <tbody>
+      {% for p in products %}
+      <tr>
+        <td>
+          <div style="font-weight:600;">{{ p.name }}</div>
+          {% if p.ai_detected %}<span class="badge badge-gold" style="font-size:9px;">AI</span>{% endif %}
+        </td>
+        <td style="font-family:'DM Mono',monospace;color:var(--muted);">{{ p.sku }}</td>
+        <td>{{ p.brand|default:"—" }}</td>
+        <td>{{ p.category.name|default:"—" }}</td>
+        <td>₦{{ p.cost_price|floatformat:0 }}</td>
+        <td>₦{{ p.selling_price|floatformat:0 }}</td>
+        <td><span class="badge {% if p.profit_margin >= 20 %}badge-green{% else %}badge-gold{% endif %}">{{ p.profit_margin }}%</span></td>
+        <td><strong>{{ p.total_stock }}</strong></td>
+        <td>
+          <a href="{% url 'product_edit' p.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="9" style="color:var(--muted);text-align:center;padding:32px;">
+        No products found. <a href="{% url 'product_create' %}" style="color:var(--gold);">Add one</a> or use the <a href="{% url 'receipt_scanner' %}" style="color:var(--gold);">AI Receipt Scanner</a>.
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% include "base/pagination.html" with page_obj=products %}
+{% endblock %}

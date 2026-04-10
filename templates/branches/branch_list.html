@@ -1,0 +1,45 @@
+{% extends "base/base.html" %}
+{% block title %}Branches{% endblock %}
+{% block page_title %}Branches{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'branch_create' %}" class="btn btn-primary">+ Add Branch</a>
+{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+  {% for branch in branches %}
+  <div class="card" style="position:relative;overflow:hidden;">
+    {% if branch.is_main %}
+    <div style="position:absolute;top:12px;right:12px;">
+      <span class="badge badge-gold">MAIN STORE</span>
+    </div>
+    {% endif %}
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px;">
+      {{ branch.name }}
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">📍 {{ branch.location }}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;">TODAY SALES</div>
+        <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--gold);margin-top:4px;">
+          ₦{{ branch.total_sales|floatformat:0 }}
+        </div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:0.08em;">STOCK VALUE</div>
+        <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--sage2);margin-top:4px;">
+          ₦{{ branch.total_stock_value|floatformat:0 }}
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="{% url 'branch_detail' branch.pk %}" class="btn btn-secondary btn-sm" style="flex:1;text-align:center;">View Detail</a>
+      <a href="{% url 'stock_list' %}?branch={{ branch.pk }}" class="btn btn-secondary btn-sm">Stock</a>
+    </div>
+  </div>
+  {% empty %}
+  <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">
+    No branches yet. <a href="{% url 'branch_create' %}" style="color:var(--gold);">Create the first branch →</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

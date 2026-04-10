@@ -1,0 +1,45 @@
+{% extends "base/base.html" %}
+{% block title %}Stock Log{% endblock %}
+{% block page_title %}Stock Audit Log{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+    Showing last 200 stock movements across all branches.
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>PRODUCT</th><th>BRANCH</th><th>CHANGE</th><th>REASON</th><th>NOTE</th><th>BY</th><th>DATE</th>
+      </tr></thead>
+      <tbody>
+      {% for log in logs %}
+      <tr>
+        <td><strong>{{ log.stock.product.name }}</strong></td>
+        <td style="color:var(--muted);">{{ log.stock.branch.name }}</td>
+        <td style="font-family:'DM Mono',monospace;font-weight:700;font-size:15px;
+          color:{% if log.change > 0 %}var(--sage2){% else %}#e84c7a{% endif %};">
+          {% if log.change > 0 %}+{% endif %}{{ log.change }}
+        </td>
+        <td>
+          <span class="badge
+            {% if log.reason == 'sale' %}badge-red
+            {% elif log.reason == 'restock' %}badge-green
+            {% elif log.reason == 'transfer' %}badge-gold
+            {% else %}badge-gray{% endif %}">
+            {{ log.get_reason_display }}
+          </span>
+        </td>
+        <td style="color:var(--muted);font-size:12px;max-width:200px;">{{ log.note|truncatechars:45 }}</td>
+        <td style="color:var(--muted);font-size:12px;">{{ log.performed_by.username|default:"system" }}</td>
+        <td style="color:var(--muted);font-size:12px;white-space:nowrap;">{{ log.created_at|date:"d M Y H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" style="color:var(--muted);text-align:center;padding:32px;">
+        No stock movements yet.
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

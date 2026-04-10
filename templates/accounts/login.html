@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cosmetica — Sign In</title>
+<script>(function(){ const t=localStorage.getItem('cosmetica-theme')||'dark'; document.documentElement.setAttribute('data-theme',t); })();</script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root,[data-theme="dark"]{
+  --bg:#0c0e14;--card:#13161f;--border:#252838;--text:#e8e4dc;--muted:#8b8fa8;
+  --gold:#c8973a;--gold2:#e8b55a;--input-bg:#1a1e2a;--err-bg:rgba(192,0,58,0.1);--err-border:rgba(192,0,58,0.25);--err-text:#e84c7a;
+}
+[data-theme="light"]{
+  --bg:#f5f3ee;--card:#ffffff;--border:#d8d3c8;--text:#1a1814;--muted:#6b6560;
+  --gold:#a0721c;--gold2:#c8973a;--input-bg:#ede9e1;--err-bg:rgba(192,0,58,0.06);--err-border:rgba(192,0,58,0.2);--err-text:#c0003a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);font-family:'DM Sans',sans-serif;padding:20px;
+  transition:background 0.25s;
+}
+.login-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:40px 36px;width:100%;max-width:380px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.15);transition:background 0.25s,border-color 0.25s;
+}
+.brand{text-align:center;margin-bottom:32px;}
+.brand-name{
+  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.brand-sub{font-size:11px;color:var(--muted);letter-spacing:0.12em;margin-top:4px;}
+h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
+p{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.form-group{margin-bottom:16px;}
+label{display:block;font-size:11px;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;}
+input{
+  width:100%;padding:11px 14px;background:var(--input-bg);
+  border:1.5px solid var(--border);border-radius:8px;
+  color:var(--text);font-size:14px;transition:border-color 0.2s,background 0.25s;
+}
+input:focus{outline:none;border-color:var(--gold);}
+.btn-login{
+  width:100%;padding:13px;margin-top:8px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#fff;border:none;border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.03em;
+}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,151,58,0.35);}
+.error{background:var(--err-bg);border:1px solid var(--err-border);
+  color:var(--err-text);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;}
+.footer-note{text-align:center;font-size:11px;color:var(--muted);margin-top:24px;}
+/* Theme toggle on login */
+.login-theme-toggle{
+  position:fixed;top:16px;right:16px;
+  display:flex;align-items:center;gap:8px;padding:7px 14px;
+  background:var(--card);border:1.5px solid var(--border);border-radius:99px;
+  cursor:pointer;font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif;
+  transition:all 0.2s;
+}
+.login-theme-toggle:hover{border-color:var(--gold);color:var(--gold);}
+</style>
+</head>
+<body>
+<!-- Theme toggle -->
+<button class="login-theme-toggle" onclick="toggleTheme()">
+  <span id="themeIcon">🌙</span>
+  <span id="themeText">Dark</span>
+</button>
+
+<div class="login-card">
+  <div class="brand">
+    <div class="brand-name">✦ Cosmetica</div>
+    <div class="brand-sub">STORE MANAGEMENT SYSTEM</div>
+  </div>
+  <h2>Welcome back</h2>
+  <p>Sign in to your store account</p>
+  {% if form.errors %}
+  <div class="error">⚠ Invalid username or password. Try again.</div>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>USERNAME</label>
+      <input type="text" name="username" placeholder="Enter username" autofocus/>
+    </div>
+    <div class="form-group">
+      <label>PASSWORD</label>
+      <input type="password" name="password" placeholder="Enter password"/>
+    </div>
+    <input type="hidden" name="next" value="{{ next }}"/>
+    <button type="submit" class="btn-login">Sign In →</button>
+  </form>
+  <div class="footer-note">Cosmetica Multi-Branch Store Manager</div>
+</div>
+<script>
+function toggleTheme(){
+  const html=document.documentElement;
+  const next=html.getAttribute('data-theme')==='dark'?'light':'dark';
+  html.setAttribute('data-theme',next);
+  localStorage.setItem('cosmetica-theme',next);
+  syncIcon(next);
+}
+function syncIcon(t){
+  document.getElementById('themeIcon').textContent=t==='dark'?'🌙':'☀️';
+  document.getElementById('themeText').textContent=t==='dark'?'Dark':'Light';
+}
+syncIcon(document.documentElement.getAttribute('data-theme')||'dark');
+</script>
+</body>
+</html>

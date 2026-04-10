@@ -1,0 +1,48 @@
+{% extends "base/base.html" %}
+{% block title %}Scan History{% endblock %}
+{% block page_title %}AI Scan History{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'receipt_scanner' %}" class="btn btn-primary">🧾 Scan Receipt</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>DETECTED</th><th>BRAND</th><th>METHOD</th><th>CONFIDENCE</th><th>ACCEPTED</th><th>BY</th><th>DATE</th>
+      </tr></thead>
+      <tbody>
+      {% for scan in scans %}
+      <tr>
+        <td><strong>{{ scan.detected_name|default:"Unknown" }}</strong></td>
+        <td style="color:var(--muted);">{{ scan.detected_brand|default:"—" }}</td>
+        <td><span class="badge badge-gray">{{ scan.get_method_display }}</span></td>
+        <td>
+          {% if scan.confidence %}
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:60px;height:4px;background:var(--bg3);border-radius:2px;">
+              <div style="width:{{ scan.confidence|floatformat:0 }}%;height:100%;border-radius:2px;
+                background:{% if scan.confidence >= 0.8 %}var(--sage2){% elif scan.confidence >= 0.5 %}var(--gold){% else %}#e84c7a{% endif %};"></div>
+            </div>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;">{{ scan.confidence|floatformat:0 }}%</span>
+          </div>
+          {% else %}—{% endif %}
+        </td>
+        <td>
+          {% if scan.accepted == True %}<span class="badge badge-green">✓ Yes</span>
+          {% elif scan.accepted == False %}<span class="badge badge-red">✗ No</span>
+          {% else %}<span class="badge badge-gray">Pending</span>{% endif %}
+        </td>
+        <td style="color:var(--muted);font-size:12px;">{{ scan.scanned_by.username|default:"—" }}</td>
+        <td style="color:var(--muted);font-size:12px;">{{ scan.created_at|date:"d M Y H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" style="color:var(--muted);text-align:center;padding:32px;">
+        No AI scans yet. <a href="{% url 'receipt_scanner' %}" style="color:var(--gold);">Scan your first receipt →</a>
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

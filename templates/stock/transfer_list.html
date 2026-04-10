@@ -1,0 +1,45 @@
+{% extends "base/base.html" %}
+{% block title %}Stock Transfers{% endblock %}
+{% block page_title %}Stock Transfers{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'transfer_create' %}" class="btn btn-primary">+ New Transfer</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>PRODUCT</th><th>FROM</th><th>TO</th><th>QTY</th><th>STATUS</th><th>REQUESTED BY</th><th>DATE</th><th></th>
+      </tr></thead>
+      <tbody>
+      {% for t in transfers %}
+      <tr>
+        <td><strong>{{ t.product.name }}</strong></td>
+        <td style="color:var(--muted);">{{ t.from_branch.name }}</td>
+        <td>{{ t.to_branch.name }}</td>
+        <td style="font-family:'DM Mono',monospace;font-weight:700;">{{ t.quantity }}</td>
+        <td>
+          {% if t.status == 'completed' %}<span class="badge badge-green">Completed</span>
+          {% elif t.status == 'pending' %}<span class="badge badge-gold">Pending</span>
+          {% elif t.status == 'cancelled' %}<span class="badge badge-red">Cancelled</span>
+          {% else %}<span class="badge badge-gray">{{ t.get_status_display }}</span>{% endif %}
+        </td>
+        <td style="color:var(--muted);font-size:12px;">{{ t.requested_by.username|default:"—" }}</td>
+        <td style="color:var(--muted);font-size:12px;">{{ t.created_at|date:"d M Y" }}</td>
+        <td>
+          {% if t.status == 'pending' %}
+          <form method="post" action="{% url 'transfer_approve' t.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm">✓ Approve</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8" style="color:var(--muted);text-align:center;padding:32px;">No transfers yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

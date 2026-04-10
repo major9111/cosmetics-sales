@@ -1,0 +1,57 @@
+{% extends "base/base.html" %}
+{% block title %}Restock{% endblock %}
+{% block page_title %}Restock: {{ product.name }}{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+  <div class="card">
+    <div class="card-title">Manual Restock</div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">BRANCH</label>
+        <select class="form-control" name="branch_id">
+          {% for b in branches %}<option value="{{ b.id }}">{{ b.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">QUANTITY TO ADD</label>
+        <input class="form-control" name="quantity" type="number" min="1" placeholder="e.g. 24" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">NOTE (optional)</label>
+        <input class="form-control" name="note" placeholder="e.g. Supplier delivery — Invoice #123"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button type="submit" class="btn btn-primary">+ Add Stock</button>
+        <a href="{% url 'stock_list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Current Stock by Branch</div>
+    {% for s in product.stocks.all %}
+    <div style="display:flex;justify-content:space-between;align-items:center;
+      padding:12px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-weight:600;font-size:13px;">{{ s.branch.name }}</div>
+        <div style="font-size:11px;color:var(--muted);">Threshold: {{ s.low_stock_threshold }}</div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;
+        color:{% if s.is_out %}#e84c7a{% elif s.is_low %}var(--gold){% else %}var(--sage2){% endif %};">
+        {{ s.quantity }}
+      </div>
+    </div>
+    {% empty %}
+    <p style="color:var(--muted);font-size:13px;">No stock records for this product yet.</p>
+    {% endfor %}
+
+    <div style="margin-top:16px;padding:14px;background:var(--bg3);border-radius:8px;">
+      <div style="font-size:11px;color:var(--muted);letter-spacing:0.08em;">TOTAL STOCK (ALL BRANCHES)</div>
+      <div style="font-family:'DM Mono',monospace;font-size:28px;font-weight:700;color:var(--gold);margin-top:4px;">
+        {{ product.total_stock }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

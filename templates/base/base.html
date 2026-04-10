@@ -1,0 +1,455 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>{% block title %}Cosmetica{% endblock %} — Store Manager</title>
+<!-- Apply saved theme BEFORE paint to avoid flash -->
+<script>
+  (function(){
+    const t = localStorage.getItem('cosmetica-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════
+   DARK THEME (default)
+═══════════════════════════════════════════════ */
+:root,
+[data-theme="dark"] {
+  --bg:      #0c0e14;
+  --bg2:     #13161f;
+  --bg3:     #1a1e2a;
+  --border:  #252838;
+  --gold:    #c8973a;
+  --gold2:   #e8b55a;
+  --rose:    #c0003a;
+  --sage:    #3d6b52;
+  --sage2:   #52a070;
+  --text:    #e8e4dc;
+  --muted:   #8b8fa8;
+  --white:   #ffffff;
+  --shadow:  0 4px 24px rgba(0,0,0,0.35);
+  --r:       10px;
+  --nav-w:   240px;
+
+  /* Toggle button */
+  --toggle-bg:     #1a1e2a;
+  --toggle-border: #252838;
+  --toggle-track:  #252838;
+  --toggle-thumb:  #c8973a;
+  --toggle-icon-dark:  1;
+  --toggle-icon-light: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   LIGHT THEME
+═══════════════════════════════════════════════ */
+[data-theme="light"] {
+  --bg:      #f5f3ee;
+  --bg2:     #ffffff;
+  --bg3:     #ede9e1;
+  --border:  #d8d3c8;
+  --gold:    #a0721c;
+  --gold2:   #c8973a;
+  --rose:    #c0003a;
+  --sage:    #2d5a3e;
+  --sage2:   #3d7a54;
+  --text:    #1a1814;
+  --muted:   #6b6560;
+  --white:   #ffffff;
+  --shadow:  0 4px 24px rgba(0,0,0,0.08);
+  --r:       10px;
+  --nav-w:   240px;
+
+  --toggle-bg:     #ede9e1;
+  --toggle-border: #d8d3c8;
+  --toggle-track:  #d8d3c8;
+  --toggle-thumb:  #a0721c;
+  --toggle-icon-dark:  0;
+  --toggle-icon-light: 1;
+}
+
+/* ── Smooth transitions for theme switch ── */
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease;
+}
+/* Don't animate transforms/opacity with the global rule */
+.fade-up, .spinner, .theme-toggle-thumb { transition: none !important; }
+.fade-up { animation: fadeUp 0.4s ease both; }
+.spinner {
+  transition: border-color 0.25s ease !important;
+  animation: spin 0.7s linear infinite;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ── Layout ── */
+.layout { display: flex; min-height: 100vh; }
+.main-content { flex: 1; margin-left: var(--nav-w); min-height: 100vh; display: flex; flex-direction: column; }
+.page { flex: 1; padding: 28px 24px; max-width: 1200px; }
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed; top: 0; left: 0; width: var(--nav-w); height: 100vh;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; z-index: 100;
+  overflow-y: auto; box-shadow: var(--shadow);
+}
+.sidebar-brand { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+.brand-name {
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.brand-sub { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-top: 2px; }
+.sidebar-user {
+  padding: 12px 16px; margin: 12px;
+  background: var(--bg3); border-radius: var(--r); border: 1px solid var(--border);
+}
+.user-name { font-weight: 600; font-size: 13px; }
+.user-role {
+  font-size: 10px; letter-spacing: 0.08em; margin-top: 3px;
+  color: var(--gold); background: rgba(200,151,58,0.12);
+  display: inline-block; padding: 2px 8px; border-radius: 99px;
+}
+.nav-section { padding: 8px 12px 4px; font-size: 10px; letter-spacing: 0.12em; color: var(--muted); }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; margin: 1px 8px; border-radius: 8px;
+  color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(200,151,58,0.12); color: var(--gold); }
+.nav-item .icon { width: 18px; text-align: center; font-size: 16px; }
+.nav-badge { margin-left: auto; background: var(--rose); color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 99px; }
+.sidebar-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); }
+.btn-logout {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px; width: 100%;
+  background: transparent; border: 1px solid var(--border); border-radius: 8px;
+  color: var(--muted); font-size: 13px; cursor: pointer;
+}
+.btn-logout:hover { border-color: var(--rose); color: var(--rose); }
+
+/* ── Topbar ── */
+.topbar {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow);
+}
+.topbar-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; }
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+/* ══════════════════════════════════════════════
+   THEME TOGGLE BUTTON
+══════════════════════════════════════════════ */
+.theme-toggle {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 99px;
+  background: var(--toggle-bg); border: 1.5px solid var(--toggle-border);
+  cursor: pointer; user-select: none; flex-shrink: 0;
+  transition: border-color 0.2s, background 0.25s;
+}
+.theme-toggle:hover { border-color: var(--gold); }
+
+/* The pill track */
+.toggle-track {
+  width: 36px; height: 20px; border-radius: 99px;
+  background: var(--toggle-track); position: relative;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+[data-theme="dark"]  .toggle-track { background: #252838; }
+[data-theme="light"] .toggle-track { background: #c8973a; }
+
+/* The sliding thumb */
+.toggle-thumb {
+  position: absolute; top: 3px; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--white);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  left: 3px;
+  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+[data-theme="dark"]  .toggle-thumb { left: 3px; }
+[data-theme="light"] .toggle-thumb { left: 19px; }
+
+/* Sun / Moon icons */
+.toggle-icons { display: flex; gap: 4px; align-items: center; }
+.icon-moon, .icon-sun {
+  font-size: 14px; line-height: 1;
+  transition: opacity 0.2s, transform 0.3s;
+}
+[data-theme="dark"]  .icon-moon { opacity: 1; transform: rotate(0deg); }
+[data-theme="dark"]  .icon-sun  { opacity: 0.3; }
+[data-theme="light"] .icon-moon { opacity: 0.3; }
+[data-theme="light"] .icon-sun  { opacity: 1; transform: rotate(20deg); }
+
+.toggle-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--muted); font-family: 'DM Mono', monospace;
+  min-width: 30px;
+}
+
+/* ── Buttons ── */
+.btn {
+  padding: 8px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--gold); color: var(--bg2); }
+.btn-primary:hover { background: var(--gold2); }
+.btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger { background: rgba(192,0,58,0.15); color: var(--rose); border: 1px solid rgba(192,0,58,0.3); }
+.btn-danger:hover { background: rgba(192,0,58,0.25); }
+.btn-success { background: rgba(61,107,82,0.2); color: var(--sage2); border: 1px solid rgba(61,107,82,0.3); }
+.btn-success:hover { background: rgba(61,107,82,0.3); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+/* ── Cards ── */
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; }
+.card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 16px; }
+
+/* ── KPI grid ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.kpi {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 18px 16px; position: relative; overflow: hidden;
+}
+.kpi::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+}
+.kpi-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.kpi-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; line-height: 1; }
+.kpi-sub { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.kpi-icon { position: absolute; right: 14px; top: 14px; font-size: 24px; opacity: 0.12; }
+
+/* ── Table ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; font-size: 10px; letter-spacing: 0.1em; color: var(--muted);
+  padding: 10px 14px; border-bottom: 1px solid var(--border); font-weight: 600;
+}
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(200,151,58,0.03); }
+
+/* ── Badges ── */
+.badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+.badge-gold  { background: rgba(200,151,58,0.15); color: var(--gold); }
+.badge-green { background: rgba(61,107,82,0.2);   color: var(--sage2); }
+.badge-red   { background: rgba(192,0,58,0.15);   color: #e84c7a; }
+.badge-gray  { background: var(--bg3);             color: var(--muted); }
+
+/* ── Forms ── */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 11px; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+.form-control {
+  width: 100%; padding: 10px 12px; background: var(--bg3);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
+}
+.form-control:focus { outline: none; border-color: var(--gold); }
+select.form-control option { background: var(--bg3); color: var(--text); }
+
+/* ── Alerts ── */
+.alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+.alert-success { background: rgba(61,107,82,0.15);  border: 1px solid rgba(61,107,82,0.3);  color: var(--sage2); }
+.alert-error   { background: rgba(192,0,58,0.12);   border: 1px solid rgba(192,0,58,0.25);  color: #e84c7a; }
+.alert-warning { background: rgba(200,151,58,0.12); border: 1px solid rgba(200,151,58,0.25); color: var(--gold); }
+
+/* ── Animations ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes spin   { to { transform: rotate(360deg); } }
+.spinner {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid rgba(200,151,58,0.3); border-top-color: var(--gold);
+}
+
+/* ── Responsive ── */
+@media(max-width:768px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+  .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  .toggle-label { display: none; }
+  #hamburger { display: block !important; }
+}
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">✦ Cosmetica</div>
+      <div class="brand-sub">STORE MANAGEMENT</div>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="sidebar-user">
+      <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+      <div class="user-role">{{ user.get_role_display }}</div>
+      {% if user.branch %}<div style="font-size:11px;color:var(--muted);margin-top:4px;">📍 {{ user.branch.name }}</div>{% endif %}
+    </div>
+    {% endif %}
+
+    <nav style="flex:1;padding:8px 0;">
+      <div class="nav-section">MAIN</div>
+      <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <span class="icon">◈</span> Dashboard
+      </a>
+
+      <div class="nav-section">INVENTORY</div>
+      <a href="{% url 'product_list' %}" class="nav-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+        <span class="icon">◻</span> Products
+      </a>
+      <a href="{% url 'stock_list' %}" class="nav-item {% if request.resolver_match.url_name == 'stock_list' %}active{% endif %}">
+        <span class="icon">◈</span> Stock Levels
+      </a>
+      <a href="{% url 'low_stock_alerts' %}" class="nav-item {% if request.resolver_match.url_name == 'low_stock_alerts' %}active{% endif %}">
+        <span class="icon">⚠</span> Low Stock Alerts
+      </a>
+      <a href="{% url 'receipt_scanner' %}" class="nav-item {% if request.resolver_match.url_name == 'receipt_scanner' %}active{% endif %}">
+        <span class="icon">🧾</span> Receipt Scanner
+        <span class="nav-badge" style="background:var(--gold);color:var(--bg);">AI</span>
+      </a>
+      <a href="{% url 'transfer_list' %}" class="nav-item {% if 'transfer' in request.resolver_match.url_name %}active{% endif %}">
+        <span class="icon">⇄</span> Transfers
+      </a>
+      <a href="{% url 'stock_log' %}" class="nav-item {% if request.resolver_match.url_name == 'stock_log' %}active{% endif %}">
+        <span class="icon">≡</span> Stock Log
+      </a>
+
+      <div class="nav-section">SALES</div>
+      <a href="{% url 'sale_create' %}" class="nav-item {% if request.resolver_match.url_name == 'sale_create' %}active{% endif %}">
+        <span class="icon">+</span> New Sale / POS
+      </a>
+      <a href="{% url 'sale_list' %}" class="nav-item {% if request.resolver_match.url_name == 'sale_list' %}active{% endif %}">
+        <span class="icon">≡</span> Sales History
+      </a>
+      <a href="{% url 'reports' %}" class="nav-item {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
+        <span class="icon">◈</span> Reports
+      </a>
+
+      {% if user.is_super_admin %}
+      <div class="nav-section">ADMIN</div>
+      <a href="{% url 'branch_list' %}" class="nav-item {% if 'branch' in request.resolver_match.url_name %}active{% endif %}">
+        <span class="icon">◻</span> Branches
+      </a>
+      <a href="{% url 'user_list' %}" class="nav-item {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+        <span class="icon">◈</span> Staff / Users
+      </a>
+      <a href="/admin/" class="nav-item">
+        <span class="icon">⚙</span> Django Admin
+      </a>
+      {% endif %}
+    </nav>
+
+    <div class="sidebar-footer">
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+        <button type="submit" class="btn-logout">⎋ Sign Out</button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main-content">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button id="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')"
+          style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1;"
+          aria-label="Toggle menu">☰</button>
+        <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+      </div>
+      <div class="topbar-actions">
+        {% block topbar_actions %}{% endblock %}
+
+        <!-- ══ THEME TOGGLE ══ -->
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light / dark mode" aria-label="Toggle theme">
+          <div class="toggle-icons">
+            <span class="icon-moon">🌙</span>
+            <span class="icon-sun">☀️</span>
+          </div>
+          <div class="toggle-track">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="toggle-label" id="toggleLabel">DARK</span>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="page fade-up">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'success' }}">{{ message }}</div>
+      {% endfor %}
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Theme toggle ────────────────────────────────────────────────
+function toggleTheme() {
+  const html    = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const next    = current === 'dark' ? 'light' : 'dark';
+
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('cosmetica-theme', next);
+  updateToggleLabel(next);
+}
+
+function updateToggleLabel(theme) {
+  const label = document.getElementById('toggleLabel');
+  if (label) label.textContent = theme === 'dark' ? 'DARK' : 'LIGHT';
+}
+
+// Sync label on load
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('cosmetica-theme') || 'dark';
+  updateToggleLabel(saved);
+
+  // Mobile sidebar auto-close on nav click
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth < 768)
+        document.getElementById('sidebar').classList.remove('open');
+    });
+  });
+
+  // Close sidebar when clicking outside (mobile)
+  document.addEventListener('click', (e) => {
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger');
+    if (window.innerWidth < 768 &&
+        sidebar.classList.contains('open') &&
+        !sidebar.contains(e.target) &&
+        e.target !== hamburger) {
+      sidebar.classList.remove('open');
+    }
+  });
+});
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

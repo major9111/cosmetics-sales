@@ -1,0 +1,54 @@
+{% extends "base/base.html" %}
+{% block title %}Low Stock Alerts{% endblock %}
+{% block page_title %}⚠ Low Stock Alerts{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'receipt_scanner' %}" class="btn btn-primary">🧾 Scan Receipt to Restock</a>
+{% endblock %}
+{% block content %}
+{% if alerts %}
+<div class="alert alert-warning" style="margin-bottom:20px;">
+  {{ alerts|length }} product{{ alerts|length|pluralize }} need restocking across your branches.
+</div>
+{% endif %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>PRODUCT</th><th>BRAND</th><th>BRANCH</th><th>QTY</th><th>THRESHOLD</th><th>STATUS</th><th></th>
+      </tr></thead>
+      <tbody>
+      {% for a in alerts %}
+      <tr>
+        <td>
+          <strong>{{ a.product.name }}</strong>
+          <div style="font-size:11px;color:var(--muted);">{{ a.product.sku }}</div>
+        </td>
+        <td style="color:var(--muted);">{{ a.product.brand|default:"—" }}</td>
+        <td>{{ a.branch.name }}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;
+          color:{% if a.is_out %}#e84c7a{% else %}var(--gold){% endif %};">
+          {{ a.quantity }}
+        </td>
+        <td style="color:var(--muted);">{{ a.low_stock_threshold }}</td>
+        <td>
+          {% if a.is_out %}
+            <span class="badge badge-red">OUT OF STOCK</span>
+          {% else %}
+            <span class="badge badge-gold">LOW</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'restock_form' a.product.pk %}" class="btn btn-primary btn-sm">+ Restock</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" style="color:var(--sage2);text-align:center;padding:40px;">
+        <div style="font-size:32px;margin-bottom:12px;">✅</div>
+        All stock levels are healthy across all branches!
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
