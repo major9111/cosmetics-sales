@@ -19,6 +19,10 @@
   ],
   "routes": [
     {
+      "src": "/static/admin/(.*)",
+      "dest": "/static/admin/$1"
+    },
+    {
       "src": "/static/(.*)",
       "dest": "/static/$1"
     },
