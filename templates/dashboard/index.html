@@ -3,7 +3,7 @@
 {% block page_title %}Dashboard{% endblock %}
 {% block topbar_actions %}
   <a href="{% url 'sale_create' %}" class="btn btn-primary">+ New Sale</a>
-  <a href="{% url 'receipt_scanner' %}" class="btn btn-secondary">🧾 Scan Receipt</a>
+  <a href="{% url 'receipt_scanner' %}" class="btn btn-secondary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Scan Receipt</a>
 {% endblock %}
 
 {% block content %}
@@ -13,32 +13,32 @@
     <div class="kpi-label">TODAY'S SALES</div>
     <div class="kpi-value">₦{{ today_sales|floatformat:0 }}</div>
     <div class="kpi-sub">Current day revenue</div>
-    <div class="kpi-icon">💰</div>
+    <div class="kpi-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
   </div>
   <div class="kpi" style="--accent:var(--sage2);">
     <div class="kpi-label">MONTHLY REVENUE</div>
     <div class="kpi-value" style="font-size:20px;">₦{{ month_sales|floatformat:0 }}</div>
     <div class="kpi-sub">Last 30 days</div>
-    <div class="kpi-icon">📈</div>
+    <div class="kpi-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
   </div>
   <div class="kpi">
     <div class="kpi-label">TOTAL PRODUCTS</div>
     <div class="kpi-value">{{ total_products }}</div>
     <div class="kpi-sub">Active items</div>
-    <div class="kpi-icon">◻</div>
+    <div class="kpi-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
   </div>
   <div class="kpi {% if low_stock_count > 0 %}{% endif %}">
     <div class="kpi-label">LOW STOCK</div>
     <div class="kpi-value" style="color:{% if low_stock_count > 0 %}#e8b55a{% else %}var(--sage2){% endif %}">{{ low_stock_count }}</div>
     <div class="kpi-sub">{{ out_of_stock }} out of stock</div>
-    <div class="kpi-icon">⚠</div>
+    <div class="kpi-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
   </div>
   {% if user.is_super_admin %}
   <div class="kpi">
     <div class="kpi-label">TOTAL STAFF</div>
     <div class="kpi-value">{{ total_staff }}</div>
     <div class="kpi-sub">All branches</div>
-    <div class="kpi-icon">◈</div>
+    <div class="kpi-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
   </div>
   {% endif %}
 </div>
