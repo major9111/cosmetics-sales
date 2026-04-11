@@ -86,3 +86,41 @@ def user_toggle(request, pk):
     else:
         messages.error(request, 'You cannot deactivate your own account.')
     return redirect('user_list')
+
+
+@login_required
+def profile(request):
+    from django.contrib import messages
+    branches = Branch.objects.filter(is_active=True)
+    if request.method == 'POST':
+        request.user.first_name = request.POST.get('first_name', '').strip()
+        request.user.last_name  = request.POST.get('last_name', '').strip()
+        request.user.phone      = request.POST.get('phone', '').strip()
+        request.user.email      = request.POST.get('email', '').strip()
+        request.user.save()
+        messages.success(request, 'Profile updated successfully.')
+        return redirect('profile')
+    return render(request, 'accounts/profile.html', {'branches': branches})
+
+
+@login_required
+def change_password(request):
+    from django.contrib import messages
+    from django.contrib.auth import update_session_auth_hash
+    if request.method == 'POST':
+        current  = request.POST.get('current_password', '')
+        new_pass = request.POST.get('new_password', '')
+        confirm  = request.POST.get('confirm_password', '')
+        if not request.user.check_password(current):
+            messages.error(request, 'Current password is incorrect.')
+        elif len(new_pass) < 8:
+            messages.error(request, 'New password must be at least 8 characters.')
+        elif new_pass != confirm:
+            messages.error(request, 'New passwords do not match.')
+        else:
+            request.user.set_password(new_pass)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, 'Password changed successfully.')
+            return redirect('profile')
+    return render(request, 'accounts/change_password.html')

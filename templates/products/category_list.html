@@ -1,0 +1,61 @@
+{% extends "base/base.html" %}
+{% block title %}Categories{% endblock %}
+{% block page_title %}Product Categories{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 360px;gap:22px;align-items:start;">
+  <div class="card">
+    <div class="card-title">All Categories</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Description</th><th>Products</th><th></th></tr></thead>
+        <tbody>
+        {% for cat in categories %}
+        <tr>
+          <td><strong>{{ cat.name }}</strong></td>
+          <td style="color:var(--muted);font-size:12px;">{{ cat.description|default:"—" }}</td>
+          <td>
+            <span class="badge badge-gold">{{ cat.product_set.count }}</span>
+          </td>
+          <td>
+            {% if user.is_super_admin %}
+            <form method="post" action="{% url 'category_delete' cat.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-xs"
+                onclick="return confirm('Delete {{ cat.name }}? Products in this category will become uncategorised.')">
+                Delete
+              </button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">
+          <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <strong>No categories yet</strong>
+            <p>Add your first category using the form.</p>
+          </div>
+        </td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Add Category</div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Category Name</label>
+        <input class="form-control" name="name" placeholder="e.g. Skincare, Lipstick, Perfume" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description (optional)</label>
+        <input class="form-control" name="description" placeholder="Brief description..."/>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Add Category</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

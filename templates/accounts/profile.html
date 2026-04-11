@@ -1,0 +1,71 @@
+{% extends "base/base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start;max-width:900px;">
+
+  <div class="card">
+    <div class="card-title">Profile Information</div>
+    <form method="post">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input class="form-control" name="first_name" value="{{ user.first_name }}"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input class="form-control" name="last_name" value="{{ user.last_name }}"/>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Email</label>
+          <input class="form-control" name="email" type="email" value="{{ user.email }}"/>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Phone</label>
+          <input class="form-control" name="phone" value="{{ user.phone }}"/>
+        </div>
+      </div>
+      <hr class="divider"/>
+      <div style="background:var(--bg);box-shadow:var(--neu-in);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+          <span style="color:var(--muted);">Username</span>
+          <span style="font-family:'JetBrains Mono',monospace;">{{ user.username }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+          <span style="color:var(--muted);">Role</span>
+          <span class="badge {% if user.role == 'super_admin' %}badge-gold{% elif user.role == 'branch_manager' %}badge-green{% elif user.role == 'cashier' %}badge-blue{% else %}badge-gray{% endif %}">
+            {{ user.get_role_display }}
+          </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;">
+          <span style="color:var(--muted);">Branch</span>
+          <span>{{ user.branch.name|default:"All Branches" }}</span>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Save Changes</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Change Password</div>
+    <form method="post" action="{% url 'change_password' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Current Password</label>
+        <input class="form-control" name="current_password" type="password" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <input class="form-control" name="new_password" type="password" placeholder="Min. 8 characters" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm New Password</label>
+        <input class="form-control" name="confirm_password" type="password" required/>
+      </div>
+      <button type="submit" class="btn btn-secondary" style="width:100%;">Change Password</button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

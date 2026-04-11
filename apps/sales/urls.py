@@ -7,4 +7,6 @@ urlpatterns = [
     path('<int:pk>/', views.sale_detail, name='sale_detail'),
     path('<int:pk>/receipt/', views.sale_receipt, name='sale_receipt'),
     path('reports/', views.reports, name='reports'),
+    path('<int:pk>/void/', views.sale_void, name='sale_void'),
+    path('<int:pk>/refund/', views.sale_refund, name='sale_refund'),
 ]

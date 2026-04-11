@@ -80,3 +80,28 @@ def low_stock_alerts(request):
 def receipt_scanner(request):
     branches = Branch.objects.filter(is_active=True)
     return render(request, 'ai_scanner/receipt_scanner.html', {'branches': branches})
+
+
+@login_required
+def stock_adjust(request, pk):
+    from django.contrib import messages
+    if not request.user.is_super_admin and not request.user.is_branch_manager:
+        messages.error(request, 'Only managers can adjust stock.')
+        return redirect('stock_list')
+    stock = get_object_or_404(Stock, pk=pk)
+    if request.method == 'POST':
+        new_qty = int(request.POST.get('quantity', stock.quantity))
+        note    = request.POST.get('note', '').strip()
+        diff    = new_qty - stock.quantity
+        stock.quantity = new_qty
+        stock.save()
+        if diff != 0:
+            StockLog.objects.create(
+                stock=stock, change=diff,
+                reason=StockLog.Reason.ADJUSTMENT,
+                note=note or f'Manual adjustment by {request.user.username}',
+                performed_by=request.user,
+            )
+        messages.success(request, f'Stock adjusted to {new_qty} units.')
+        return redirect('stock_list')
+    return render(request, 'stock/stock_adjust.html', {'stock': stock})

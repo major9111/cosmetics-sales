@@ -48,3 +48,36 @@ def product_edit(request, pk):
         product.save()
         return redirect('product_list')
     return render(request, 'products/product_edit.html', {'product': product, 'categories': categories})
+
+
+@login_required
+def category_list(request):
+    from django.contrib import messages
+    if request.user.is_store_agent:
+        return redirect('product_list')
+    categories = Category.objects.all()
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        desc = request.POST.get('description', '').strip()
+        if name:
+            if Category.objects.filter(name__iexact=name).exists():
+                messages.error(request, f'Category "{name}" already exists.')
+            else:
+                Category.objects.create(name=name, description=desc)
+                messages.success(request, f'Category "{name}" created.')
+        return redirect('category_list')
+    return render(request, 'products/category_list.html', {'categories': categories})
+
+
+@login_required
+def category_delete(request, pk):
+    from django.contrib import messages
+    if not request.user.is_super_admin:
+        messages.error(request, 'Only Super Admins can delete categories.')
+        return redirect('category_list')
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        name = category.name
+        category.delete()
+        messages.success(request, f'Category "{name}" deleted.')
+    return redirect('category_list')

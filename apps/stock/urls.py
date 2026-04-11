@@ -10,4 +10,5 @@ urlpatterns = [
     path('log/', views.stock_log, name='stock_log'),
     path('alerts/', views.low_stock_alerts, name='low_stock_alerts'),
     path('receipt-scanner/', views.receipt_scanner, name='receipt_scanner'),
+    path('adjust/<int:pk>/', views.stock_adjust, name='stock_adjust'),
 ]

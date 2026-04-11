@@ -457,6 +457,11 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); c
       <a href="{% url 'product_list' %}" class="nav-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span> Products
       </a>
+      {% if not user.is_store_agent %}
+      <a href="{% url 'category_list' %}" class="nav-item {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
+        <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span> Categories
+      </a>
+      {% endif %}
       <a href="{% url 'stock_list' %}" class="nav-item {% if request.resolver_match.url_name == 'stock_list' %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span> Stock Levels
       </a>
@@ -502,6 +507,10 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); c
     </nav>
 
     <div class="sidebar-footer">
+      <a href="{% url 'profile' %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:8px;background:var(--bg);box-shadow:var(--neu-btn);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text2);font-size:13px;font-weight:500;text-decoration:none;transition:all 0.2s;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
+      </a>
       <form method="post" action="{% url 'logout' %}">{% csrf_token %}
         <button type="submit" class="btn-logout">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sign Out

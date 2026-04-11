@@ -1,0 +1,30 @@
+{% extends "base/base.html" %}
+{% block title %}Void Sale{% endblock %}
+{% block page_title %}Void Sale{% endblock %}
+{% block content %}
+<div style="max-width:500px;">
+  <div class="card">
+    <div class="card-title" style="color:var(--rose);">Void Sale {{ sale.receipt_no }}</div>
+    <div class="alert alert-warning">This will void the sale and restore all stock. This cannot be undone.</div>
+    <div style="background:var(--bg);box-shadow:var(--neu-in);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Receipt</span><strong>{{ sale.receipt_no }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Branch</span><span>{{ sale.branch.name }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Total</span><span style="color:var(--gold);font-weight:700;">₦{{ sale.grand_total|floatformat:0 }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;">
+        <span style="color:var(--muted);">Items</span><span>{{ sale.items.count }} item(s)</span>
+      </div>
+    </div>
+    <form method="post" style="display:flex;gap:10px;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Confirm Void</button>
+      <a href="{% url 'sale_detail' sale.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

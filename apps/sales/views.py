@@ -81,3 +81,64 @@ def reports(request):
         'days': days,
     }
     return render(request, 'sales/reports.html', context)
+
+
+@login_required
+def sale_void(request, pk):
+    from django.contrib import messages
+    sale = get_object_or_404(Sale, pk=pk)
+    if not request.user.is_super_admin and not request.user.is_branch_manager:
+        messages.error(request, 'Only managers can void sales.')
+        return redirect('sale_detail', pk=pk)
+    if sale.status != 'completed':
+        messages.error(request, 'Only completed sales can be voided.')
+        return redirect('sale_detail', pk=pk)
+    if request.method == 'POST':
+        from apps.stock.models import Stock, StockLog
+        with __import__('django.db', fromlist=['transaction']).transaction.atomic():
+            # Restore stock
+            for item in sale.items.all():
+                stock = Stock.get_or_create_stock(sale.branch, item.product)
+                stock.quantity += item.quantity
+                stock.save()
+                StockLog.objects.create(
+                    stock=stock, change=item.quantity,
+                    reason=StockLog.Reason.RETURN,
+                    note=f'Void of sale {sale.receipt_no}',
+                    performed_by=request.user,
+                )
+            sale.status = 'voided'
+            sale.save()
+        messages.success(request, f'Sale {sale.receipt_no} has been voided and stock restored.')
+        return redirect('sale_detail', pk=pk)
+    return render(request, 'sales/sale_void_confirm.html', {'sale': sale})
+
+
+@login_required
+def sale_refund(request, pk):
+    from django.contrib import messages
+    sale = get_object_or_404(Sale, pk=pk)
+    if not request.user.is_super_admin and not request.user.is_branch_manager:
+        messages.error(request, 'Only managers can process refunds.')
+        return redirect('sale_detail', pk=pk)
+    if sale.status != 'completed':
+        messages.error(request, 'Only completed sales can be refunded.')
+        return redirect('sale_detail', pk=pk)
+    if request.method == 'POST':
+        from apps.stock.models import Stock, StockLog
+        with __import__('django.db', fromlist=['transaction']).transaction.atomic():
+            for item in sale.items.all():
+                stock = Stock.get_or_create_stock(sale.branch, item.product)
+                stock.quantity += item.quantity
+                stock.save()
+                StockLog.objects.create(
+                    stock=stock, change=item.quantity,
+                    reason=StockLog.Reason.RETURN,
+                    note=f'Refund of sale {sale.receipt_no}',
+                    performed_by=request.user,
+                )
+            sale.status = 'refunded'
+            sale.save()
+        messages.success(request, f'Sale {sale.receipt_no} refunded and stock restored.')
+        return redirect('sale_detail', pk=pk)
+    return render(request, 'sales/sale_refund_confirm.html', {'sale': sale})

@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+{% block title %}Adjust Stock{% endblock %}
+{% block page_title %}Manual Stock Adjustment{% endblock %}
+{% block content %}
+<div style="max-width:480px;">
+  <div class="card">
+    <div class="card-title">Adjust: {{ stock.product.name }}</div>
+    <div style="background:var(--bg);box-shadow:var(--neu-in);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Branch</span><strong>{{ stock.branch.name }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid var(--border);">
+        <span style="color:var(--muted);">Product</span><span>{{ stock.product.name }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;">
+        <span style="color:var(--muted);">Current Stock</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold);">{{ stock.quantity }} units</span>
+      </div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">New Quantity</label>
+        <input class="form-control" type="number" name="quantity" min="0" value="{{ stock.quantity }}" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason / Note</label>
+        <input class="form-control" name="note" placeholder="e.g. Stocktake correction, damaged goods removed..."/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button type="submit" class="btn btn-primary">Save Adjustment</button>
+        <a href="{% url 'stock_list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

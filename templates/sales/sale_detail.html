@@ -2,7 +2,14 @@
 {% block title %}Sale {{ sale.receipt_no }}{% endblock %}
 {% block page_title %}Sale Detail{% endblock %}
 {% block topbar_actions %}
-  <a href="{% url 'sale_receipt' sale.pk %}" class="btn btn-secondary">🖨 Print Receipt</a>
+  <a href="{% url 'sale_receipt' sale.pk %}" target="_blank" class="btn btn-secondary">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Print Receipt
+  </a>
+  {% if sale.status == 'completed' and user.is_branch_manager or sale.status == 'completed' and user.is_super_admin %}
+  <a href="{% url 'sale_refund' sale.pk %}" class="btn btn-secondary">Refund</a>
+  <a href="{% url 'sale_void' sale.pk %}" class="btn btn-danger">Void</a>
+  {% endif %}
   <a href="{% url 'sale_list' %}" class="btn btn-secondary">← Back</a>
 {% endblock %}
 {% block content %}
