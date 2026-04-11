@@ -17,6 +17,10 @@ def stock_list(request):
 
 @login_required
 def restock_form(request, product_id):
+    from django.contrib import messages
+    if request.user.is_store_agent:
+        messages.error(request, 'Access denied.')
+        return redirect('stock_list')
     product = get_object_or_404(Product, pk=product_id)
     branches = Branch.objects.filter(is_active=True)
     if request.method == 'POST':

@@ -10,7 +10,11 @@ import json
 @login_required
 def sale_list(request):
     from django.core.paginator import Paginator
+    from django.contrib import messages
     user = request.user
+    if user.is_store_agent:
+        messages.error(request, 'Access denied.')
+        return redirect('sale_create')
     if user.is_super_admin:
         sales = Sale.objects.select_related('branch','cashier').all()
     else:
@@ -60,7 +64,11 @@ def sale_receipt(request, pk):
 
 @login_required
 def reports(request):
+    from django.contrib import messages
     user = request.user
+    if user.is_store_agent:
+        messages.error(request, 'Access denied.')
+        return redirect('sale_create')
     branch = None if user.is_super_admin else user.branch
     days = int(request.GET.get('days', 30))
     context = {

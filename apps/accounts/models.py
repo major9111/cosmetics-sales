@@ -4,9 +4,10 @@ from django.db import models
 
 class User(AbstractUser):
     class Role(models.TextChoices):
-        SUPER_ADMIN   = 'super_admin',  'Super Admin'
+        SUPER_ADMIN    = 'super_admin',    'Super Admin'
         BRANCH_MANAGER = 'branch_manager', 'Branch Manager'
-        CASHIER       = 'cashier',      'Cashier'
+        CASHIER        = 'cashier',        'Cashier'
+        STORE_AGENT    = 'store_agent',    'Store Agent'
 
     role   = models.CharField(max_length=20, choices=Role.choices, default=Role.CASHIER)
     branch = models.ForeignKey(
@@ -30,6 +31,16 @@ class User(AbstractUser):
     @property
     def is_cashier(self):
         return self.role == self.Role.CASHIER
+
+    @property
+    def is_store_agent(self):
+        return self.role == self.Role.STORE_AGENT
+
+    @property
+    def can_sell(self):
+        """True for any role that can make sales."""
+        return self.role in (self.Role.CASHIER, self.Role.STORE_AGENT,
+                              self.Role.BRANCH_MANAGER, self.Role.SUPER_ADMIN)
 
     def __str__(self):
         return f"{self.get_full_name() or self.username} ({self.get_role_display()})"

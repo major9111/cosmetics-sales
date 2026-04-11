@@ -15,6 +15,10 @@ def product_list(request):
 
 @login_required
 def product_create(request):
+    from django.contrib import messages
+    if request.user.is_store_agent:
+        messages.error(request, 'Access denied.')
+        return redirect('stock_list')
     categories = Category.objects.all()
     if request.method == 'POST':
         Product.objects.create(
