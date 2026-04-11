@@ -1,38 +1,94 @@
 {% extends "base/base.html" %}
 {% block title %}Staff{% endblock %}
-{% block page_title %}Staff & Users{% endblock %}
+{% block page_title %}Staff &amp; Users{% endblock %}
 {% block topbar_actions %}
   <a href="{% url 'user_create' %}" class="btn btn-primary">+ Add Staff</a>
 {% endblock %}
 {% block content %}
+
+<!-- Stats row -->
+<div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:22px;">
+  <div class="kpi">
+    <div class="kpi-accent"></div>
+    <div class="kpi-label">Total Staff</div>
+    <div class="kpi-value">{{ users.count }}</div>
+    <div class="kpi-icon">&#9672;</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-accent" style="background:linear-gradient(90deg,var(--sage),var(--sage2));"></div>
+    <div class="kpi-label">Active</div>
+    <div class="kpi-value" style="color:var(--sage2);">{{ users|length }}</div>
+    <div class="kpi-icon">&#10003;</div>
+  </div>
+</div>
+
 <div class="card">
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th>NAME</th><th>USERNAME</th><th>ROLE</th><th>BRANCH</th><th>PHONE</th><th>STATUS</th>
+        <th>Staff Member</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Branch</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>Actions</th>
       </tr></thead>
       <tbody>
       {% for u in users %}
       <tr>
-        <td><strong>{{ u.get_full_name|default:"—" }}</strong></td>
-        <td style="font-family:'DM Mono',monospace;color:var(--muted);">{{ u.username }}</td>
         <td>
-          <span class="badge
-            {% if u.role == 'super_admin' %}badge-gold
-            {% elif u.role == 'branch_manager' %}badge-green
-            {% else %}badge-gray{% endif %}">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--gold3);border:1px solid rgba(212,168,83,0.3);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);font-size:13px;flex-shrink:0;box-shadow:var(--neu-btn);">
+              {{ u.username|first|upper }}
+            </div>
+            <div>
+              <div style="font-weight:600;">{{ u.get_full_name|default:"—" }}</div>
+              <div style="font-size:11px;color:var(--muted);">{{ u.email|default:"No email" }}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:12px;">{{ u.username }}</td>
+        <td>
+          <span class="badge {% if u.role == 'super_admin' %}badge-gold{% elif u.role == 'branch_manager' %}badge-green{% else %}badge-gray{% endif %}">
             {{ u.get_role_display }}
           </span>
         </td>
-        <td>{{ u.branch.name|default:"—" }}</td>
-        <td style="color:var(--muted);">{{ u.phone|default:"—" }}</td>
         <td>
-          {% if u.is_active %}<span class="badge badge-green">Active</span>
-          {% else %}<span class="badge badge-red">Inactive</span>{% endif %}
+          {% if u.branch %}
+            <span style="font-size:12px;">&#128205; {{ u.branch.name }}</span>
+          {% else %}
+            <span style="color:var(--muted);">—</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--muted);font-size:12px;">{{ u.phone|default:"—" }}</td>
+        <td>
+          {% if u.is_active %}
+            <span class="badge badge-green">&#9679; Active</span>
+          {% else %}
+            <span class="badge badge-red">&#9679; Inactive</span>
+          {% endif %}
+        </td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <a href="{% url 'user_edit' u.pk %}" class="btn btn-secondary btn-xs">Edit</a>
+            {% if u.pk != request.user.pk %}
+            <a href="{% url 'user_toggle' u.pk %}" class="btn {% if u.is_active %}btn-danger{% else %}btn-success{% endif %} btn-xs"
+               onclick="return confirm('{% if u.is_active %}Deactivate{% else %}Activate{% endif %} {{ u.username }}?')">
+              {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+            </a>
+            {% endif %}
+          </div>
         </td>
       </tr>
       {% empty %}
-      <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:32px;">No users yet.</td></tr>
+      <tr><td colspan="7">
+        <div class="empty-state">
+          <div class="empty-state-icon">&#9672;</div>
+          <strong>No staff yet</strong>
+          <p><a href="{% url 'user_create' %}">Add your first staff member &rarr;</a></p>
+        </div>
+      </td></tr>
       {% endfor %}
       </tbody>
     </table>

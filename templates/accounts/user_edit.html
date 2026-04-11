@@ -1,0 +1,59 @@
+{% extends "base/base.html" %}
+{% block title %}Edit Staff{% endblock %}
+{% block page_title %}Edit Staff Member{% endblock %}
+{% block content %}
+<div style="max-width:560px;">
+  <div class="card">
+    <div class="card-title">Edit: {{ staff_user.get_full_name|default:staff_user.username }}</div>
+    <form method="post">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input class="form-control" name="first_name" value="{{ staff_user.first_name }}"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input class="form-control" name="last_name" value="{{ staff_user.last_name }}"/>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Username</label>
+          <input class="form-control" name="username" value="{{ staff_user.username }}" required/>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">New Password <span style="color:var(--muted);font-size:10px;">(leave blank to keep current)</span></label>
+          <input class="form-control" name="password" type="password" placeholder="Enter new password or leave blank"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select class="form-control" name="role">
+            <option value="cashier" {% if staff_user.role == 'cashier' %}selected{% endif %}>Cashier</option>
+            <option value="branch_manager" {% if staff_user.role == 'branch_manager' %}selected{% endif %}>Branch Manager</option>
+            <option value="super_admin" {% if staff_user.role == 'super_admin' %}selected{% endif %}>Super Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Branch</label>
+          <select class="form-control" name="branch">
+            <option value="">— No Branch —</option>
+            {% for b in branches %}<option value="{{ b.id }}" {% if staff_user.branch_id == b.id %}selected{% endif %}>{{ b.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Phone</label>
+          <input class="form-control" name="phone" value="{{ staff_user.phone }}"/>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Email</label>
+          <input class="form-control" name="email" type="email" value="{{ staff_user.email }}"/>
+        </div>
+      </div>
+      <hr class="divider"/>
+      <div style="display:flex;gap:10px;">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
