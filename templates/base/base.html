@@ -460,6 +460,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); c
       <a href="{% url 'stock_list' %}" class="nav-item {% if request.resolver_match.url_name == 'stock_list' %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span> Stock Levels
       </a>
+      {% if not user.is_store_agent %}
       <a href="{% url 'low_stock_alerts' %}" class="nav-item {% if request.resolver_match.url_name == 'low_stock_alerts' %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Low Stock
       </a>
@@ -470,6 +471,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); c
       <a href="{% url 'transfer_list' %}" class="nav-item {% if 'transfer' in request.resolver_match.url_name %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span> Transfers
       </a>
+      {% endif %}
       <a href="{% url 'stock_log' %}" class="nav-item {% if request.resolver_match.url_name == 'stock_log' %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg></span> Stock Log
       </a>
@@ -478,12 +480,14 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); c
       <a href="{% url 'sale_create' %}" class="nav-item {% if request.resolver_match.url_name == 'sale_create' %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> New Sale / POS
       </a>
+      {% if not user.is_store_agent %}
       <a href="{% url 'sale_list' %}" class="nav-item {% if request.resolver_match.url_name == 'sale_list' %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span> Sales History
       </a>
       <a href="{% url 'reports' %}" class="nav-item {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
         <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Reports
       </a>
+      {% endif %}
 
       <div class="nav-section">Admin</div>
       <a href="{% url 'branch_list' %}" class="nav-item {% if 'branch' in request.resolver_match.url_name %}active{% endif %}">
