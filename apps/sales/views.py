@@ -22,6 +22,12 @@ def sale_list(request):
 @login_required
 def sale_create(request):
     user = request.user
+    # Guard: cashier/manager must have a branch assigned
+    if not user.is_super_admin and not user.branch_id:
+        from django.contrib import messages
+        messages.error(request, 'You have no branch assigned. Please ask your admin to assign you to a branch before making sales.')
+        return redirect('dashboard')
+
     products = Product.objects.filter(is_active=True).select_related('category')
     branches = Branch.objects.filter(is_active=True) if user.is_super_admin else Branch.objects.filter(pk=user.branch_id)
 
