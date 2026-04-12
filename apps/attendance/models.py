@@ -25,3 +25,16 @@ class Shift(models.Model):
     @property
     def is_active(self):
         return self.clock_out is None
+
+
+class CommissionRate(models.Model):
+    """Commission % per role or per staff member."""
+    staff       = models.OneToOneField("accounts.User", on_delete=models.CASCADE, 
+                                        related_name="commission_rate", null=True, blank=True)
+    role        = models.CharField(max_length=20, blank=True)
+    rate        = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # percentage
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        target = self.staff.username if self.staff else self.role
+        return f"{target} — {self.rate}%"

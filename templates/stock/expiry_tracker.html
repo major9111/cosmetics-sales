@@ -1,0 +1,71 @@
+{% extends "base/base.html" %}
+{% block title %}Expiry Tracker{% endblock %}
+{% block page_title %}Product Expiry Tracker{% endblock %}
+{% block content %}
+
+{% if expired %}
+<div class="card" style="margin-bottom:20px;border-color:var(--rose);">
+  <div class="card-title" style="color:var(--rose);">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Expired ({{ expired|length }})
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Product</th><th>Brand</th><th>Expiry Date</th><th>Days Ago</th></tr></thead>
+      <tbody>
+      {% for p in expired %}
+      <tr>
+        <td><strong>{{ p.name }}</strong></td>
+        <td style="color:var(--muted);">{{ p.brand|default:"—" }}</td>
+        <td style="color:var(--rose);font-weight:700;">{{ p.expiry_date|date:"d M Y" }}</td>
+        <td><span class="badge badge-red">Expired</span></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if expiring %}
+<div class="card" style="margin-bottom:20px;border-color:var(--gold);">
+  <div class="card-title" style="color:var(--gold);">Expiring Soon — Within 90 Days ({{ expiring|length }})</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Product</th><th>Brand</th><th>Expiry Date</th><th>Days Left</th></tr></thead>
+      <tbody>
+      {% for p in expiring %}
+      <tr>
+        <td><strong>{{ p.name }}</strong></td>
+        <td style="color:var(--muted);">{{ p.brand|default:"—" }}</td>
+        <td style="color:var(--gold);font-weight:700;">{{ p.expiry_date|date:"d M Y" }}</td>
+        <td><span class="badge badge-gold">{{ p.expiry_date|timeuntil }}</span></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-title" style="color:var(--sage2);">Safe Products ({{ safe|length }})</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Product</th><th>Brand</th><th>Expiry Date</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for p in safe %}
+      <tr>
+        <td><strong>{{ p.name }}</strong></td>
+        <td style="color:var(--muted);">{{ p.brand|default:"—" }}</td>
+        <td>{{ p.expiry_date|date:"d M Y" }}</td>
+        <td><span class="badge badge-green">Safe</span></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted);">No products with expiry dates tracked.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base/base.html" %}
+{% block title %}Commission Report{% endblock %}
+{% block page_title %}Staff Commission — {{ month|date:"F Y" }}{% endblock %}
+{% block content %}
+
+<div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px;">
+  <div class="kpi">
+    <div class="kpi-accent"></div>
+    <div class="kpi-label">Total Commission Due</div>
+    <div class="kpi-value" style="color:var(--gold);">₦{{ total_commission|floatformat:0 }}</div>
+    <div class="kpi-sub">This month</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Commission Breakdown</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Staff</th><th>Role</th><th>Sales This Month</th><th>Commission Rate</th><th>Commission Earned</th><th>Update Rate</th></tr></thead>
+      <tbody>
+      {% for d in data %}
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--gold3);border:1px solid rgba(212,168,83,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gold);">
+              {{ d.staff.username|first|upper }}
+            </div>
+            <strong>{{ d.staff.get_full_name|default:d.staff.username }}</strong>
+          </div>
+        </td>
+        <td><span class="badge badge-gray">{{ d.staff.get_role_display }}</span></td>
+        <td style="color:var(--gold);font-weight:700;">₦{{ d.sales_total|floatformat:0 }}</td>
+        <td style="font-family:'JetBrains Mono',monospace;">{{ d.rate }}%</td>
+        <td style="color:var(--sage2);font-weight:700;">₦{{ d.commission|floatformat:0 }}</td>
+        <td>
+          <form method="post" style="display:flex;gap:6px;align-items:center;">
+            {% csrf_token %}
+            <input type="hidden" name="staff_id" value="{{ d.staff.pk }}"/>
+            <input type="number" name="rate" value="{{ d.rate }}" min="0" max="100" step="0.1"
+              style="width:70px;padding:5px 8px;background:var(--bg);box-shadow:var(--neu-in);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;"/>
+            <span style="color:var(--muted);font-size:12px;">%</span>
+            <button type="submit" class="btn btn-secondary btn-xs">Set</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted);">No staff data yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

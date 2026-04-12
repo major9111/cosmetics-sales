@@ -105,3 +105,52 @@ def stock_adjust(request, pk):
         messages.success(request, f'Stock adjusted to {new_qty} units.')
         return redirect('stock_list')
     return render(request, 'stock/stock_adjust.html', {'stock': stock})
+
+
+@login_required
+def reorder_alerts(request):
+    """Products below their reorder level across branches."""
+    from apps.products.models import Product
+    from django.db.models import Sum
+    user = request.user
+    
+    products = Product.objects.filter(is_active=True).prefetch_related("stocks")
+    alerts = []
+    for p in products:
+        if user.is_super_admin:
+            total_qty = p.stocks.aggregate(t=Sum("quantity"))["t"] or 0
+        else:
+            try:
+                total_qty = p.stocks.get(branch=user.branch).quantity
+            except:
+                total_qty = 0
+        if total_qty <= getattr(p, "reorder_level", 10):
+            alerts.append({
+                "product": p,
+                "quantity": total_qty,
+                "reorder_level": getattr(p, "reorder_level", 10),
+                "deficit": max(0, getattr(p, "reorder_level", 10) - total_qty),
+            })
+    alerts.sort(key=lambda x: x["quantity"])
+    return render(request, "stock/reorder_alerts.html", {"alerts": alerts})
+
+
+@login_required
+def expiry_tracker(request):
+    """Products with expiry dates approaching or expired."""
+    from apps.products.models import Product
+    from datetime import date, timedelta
+    today = date.today()
+    soon = today + timedelta(days=90)
+    
+    products = Product.objects.filter(
+        is_active=True, expiry_date__isnull=False
+    ).order_by("expiry_date")
+    
+    expired  = [p for p in products if p.expiry_date < today]
+    expiring = [p for p in products if today <= p.expiry_date <= soon]
+    safe     = [p for p in products if p.expiry_date > soon]
+    
+    return render(request, "stock/expiry_tracker.html", {
+        "expired": expired, "expiring": expiring, "safe": safe, "today": today
+    })

@@ -1,0 +1,42 @@
+{% extends "base/base.html" %}
+{% block title %}Reorder Alerts{% endblock %}
+{% block page_title %}Reorder Alerts{% endblock %}
+{% block content %}
+{% if alerts %}
+<div class="alert alert-warning" style="margin-bottom:20px;">
+  {{ alerts|length }} product(s) need restocking.
+</div>
+{% endif %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Product</th><th>Brand</th><th>Current Stock</th><th>Reorder Level</th><th>Deficit</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for a in alerts %}
+      <tr>
+        <td><strong>{{ a.product.name }}</strong></td>
+        <td style="color:var(--muted);">{{ a.product.brand|default:"—" }}</td>
+        <td>
+          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:{% if a.quantity == 0 %}var(--rose){% else %}var(--gold){% endif %};">
+            {{ a.quantity }}
+          </span>
+        </td>
+        <td style="color:var(--muted);">{{ a.reorder_level }}</td>
+        <td><span class="badge badge-red">Need {{ a.deficit }} more</span></td>
+        <td><a href="{% url 'restock_form' a.product.pk %}" class="btn btn-success btn-sm">+ Restock</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <strong>All products are above reorder level!</strong>
+        </div>
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
