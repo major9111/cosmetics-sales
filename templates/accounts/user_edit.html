@@ -27,7 +27,8 @@
         <div class="form-group">
           <label class="form-label">Role</label>
           <select class="form-control" name="role">
-            <option value="cashier" {% if staff_user.role == 'cashier' %}selected{% endif %}>Cashier</option>
+            <option value="store_agent" {% if staff_user.role == 'store_agent' %}selected{% endif %}>Store Agent</option>
+          <option value="cashier" {% if staff_user.role == 'cashier' %}selected{% endif %}>Cashier</option>
             <option value="branch_manager" {% if staff_user.role == 'branch_manager' %}selected{% endif %}>Branch Manager</option>
             <option value="super_admin" {% if staff_user.role == 'super_admin' %}selected{% endif %}>Super Admin</option>
           </select>
