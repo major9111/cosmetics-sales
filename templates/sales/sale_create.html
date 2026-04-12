@@ -183,7 +183,7 @@
 
     <div class="cart-items" id="cartItems">
       <div class="cart-empty" id="cartEmpty">
-        <div class="icon">🛍️</div>
+        <div class="icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
         Tap a product to add it
       </div>
     </div>
@@ -210,9 +210,9 @@
 
     <div class="cart-footer">
       <div class="payment-btns">
-        <div class="pay-btn active" onclick="selectPayment(this,'cash')">💵 Cash</div>
-        <div class="pay-btn" onclick="selectPayment(this,'pos')">💳 POS/Card</div>
-        <div class="pay-btn" onclick="selectPayment(this,'transfer')">🏦 Transfer</div>
+        <div class="pay-btn active" onclick="selectPayment(this,'cash')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Cash</div>
+        <div class="pay-btn" onclick="selectPayment(this,'pos')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> POS/Card</div>
+        <div class="pay-btn" onclick="selectPayment(this,'transfer')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> Transfer</div>
         <div class="pay-btn" onclick="selectPayment(this,'credit')">📋 Credit</div>
       </div>
       <input type="hidden" id="paymentMethod" value="cash"/>
@@ -235,7 +235,7 @@
     </div>
     <div style="text-align:center;font-size:11px;color:#888;margin-top:14px;" id="receiptNo"></div>
     <div class="receipt-actions">
-      <button class="btn btn-secondary" style="flex:1;" onclick="window.print()">🖨 Print</button>
+      <button class="btn btn-secondary" style="flex:1;" onclick="window.print()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
       <button class="btn btn-primary" style="flex:1;" onclick="closeReceipt()">New Sale</button>
     </div>
   </div>

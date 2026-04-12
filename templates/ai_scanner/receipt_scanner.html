@@ -152,7 +152,7 @@
       </div>
 
       <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-        <div style="font-size:44px;margin-bottom:10px;">🧾</div>
+        <div style="margin-bottom:14px;opacity:0.5;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
         <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:17px;margin-bottom:6px;">
           Drop receipt here
         </div>
@@ -167,7 +167,7 @@
       </div>
 
       <button class="btn btn-secondary" style="width:100%;" onclick="openCamera()">
-        📷 Use Camera
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Use Camera
       </button>
     </div>
 
@@ -185,7 +185,7 @@
 
       <div style="display:flex;gap:10px;margin-top:14px;" id="scanControls">
         <button class="btn btn-primary" style="flex:1;" id="scanBtn" onclick="scanReceipt()">
-          🤖 Scan with AI
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg> Scan with AI
         </button>
         <button class="btn btn-secondary" onclick="clearAll()">✕ Clear</button>
       </div>
@@ -226,7 +226,7 @@
 
     <div class="summary-card" id="summaryCard" style="display:none;">
       <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--gold);margin-bottom:12px;">
-        📦 Stock Update Summary
+        Stock Update Summary
       </div>
       <div id="summaryRows"></div>
       <div class="summary-row" style="margin-top:6px;padding-top:10px;border-top:1px solid var(--border);">
@@ -242,7 +242,7 @@
     <button class="btn btn-primary" id="commitBtn"
       style="width:100%;margin-top:14px;padding:14px;font-size:14px;display:none;"
       onclick="commitToStock()">
-      📦 Commit to Stock
+      Commit to Stock
     </button>
 
     <button class="btn btn-secondary" style="width:100%;margin-top:10px;" onclick="clearAll()">
@@ -256,12 +256,12 @@
 <div class="modal-overlay" id="cameraModal">
   <div class="modal-box">
     <div style="font-family:'Playfair Display',serif;font-weight:700;margin-bottom:14px;color:var(--gold);">
-      📷 Camera
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Camera
     </div>
     <video id="cameraVideo" autoplay playsinline
       style="width:100%;border-radius:var(--r-sm);background:#000;"></video>
     <div style="display:flex;gap:10px;margin-top:14px;">
-      <button class="btn btn-primary" style="flex:1;" onclick="capturePhoto()">📸 Capture</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="capturePhoto()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Capture</button>
       <button class="btn btn-secondary" onclick="closeCamera()">✕ Cancel</button>
     </div>
   </div>
@@ -270,7 +270,7 @@
 <!-- Success Modal -->
 <div class="modal-overlay" id="successModal">
   <div class="modal-box" style="text-align:center;">
-    <div style="font-size:52px;margin-bottom:14px;">🎉</div>
+    <div style="margin-bottom:14px;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gold);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
     <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:22px;margin-bottom:8px;">
       Stock Updated!
     </div>
@@ -427,10 +427,10 @@ function renderItems() {
             <span class="chip">${item.category}</span>
             <span class="chip">${Math.round(item.confidence*100)}% confidence</span>
           </div>
-          ${item.notes ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">📝 ${item.notes}</div>` : ''}
+          ${item.notes ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">${item.notes}</div>` : ''}
         </div>
         <div style="font-size:22px;">
-          ${item.status==='approved' ? '✅' : item.status==='rejected' ? '❌' : '⏳'}
+          ${item.status==='approved' ? '✓' : item.status==='rejected' ? '✕' : '…'}
         </div>
       </div>
       <div class="item-fields">
@@ -497,7 +497,7 @@ function renderSummary() {
   if (approved.length > 0) {
     card.style.display = 'block';
     btn.style.display  = 'block';
-    btn.textContent    = `📦 Commit ${approved.length} Item${approved.length!==1?'s':''} to Stock`;
+    btn.textContent    = `Commit ${approved.length} Item${approved.length!==1?'s':''} to Stock`;
     document.getElementById('summaryRows').innerHTML = approved.map(i => `
       <div class="summary-row">
         <span>${i.name}${i.brand?' · '+i.brand:''}</span>
