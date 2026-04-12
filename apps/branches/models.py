@@ -8,6 +8,7 @@ class Branch(models.Model):
     email    = models.EmailField(blank=True)
     is_main  = models.BooleanField(default=False)   # True = head office / main store
     is_active = models.BooleanField(default=True)
+    daily_target = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

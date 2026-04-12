@@ -142,3 +142,52 @@ def sale_refund(request, pk):
         messages.success(request, f'Sale {sale.receipt_no} refunded and stock restored.')
         return redirect('sale_detail', pk=pk)
     return render(request, 'sales/sale_refund_confirm.html', {'sale': sale})
+
+
+@login_required
+def cash_reconciliation(request):
+    from apps.sales.models import Sale
+    from django.utils import timezone
+    from datetime import timedelta
+    user = request.user
+    today = timezone.now().date()
+    if user.is_super_admin:
+        sales = Sale.objects.filter(created_at__date=today)
+    else:
+        sales = Sale.objects.filter(branch=user.branch, created_at__date=today)
+    
+    cash_sales    = sales.filter(payment_method="cash", status="completed")
+    pos_sales     = sales.filter(payment_method="pos", status="completed")
+    transfer_sales = sales.filter(payment_method="transfer", status="completed")
+    
+    from django.db.models import Sum
+    cash_total     = cash_sales.aggregate(t=Sum("grand_total"))["t"] or 0
+    pos_total      = pos_sales.aggregate(t=Sum("grand_total"))["t"] or 0
+    transfer_total = transfer_sales.aggregate(t=Sum("grand_total"))["t"] or 0
+    grand          = cash_total + pos_total + transfer_total
+    
+    actual_cash = None
+    variance    = None
+    if request.method == "POST":
+        actual_cash = float(request.POST.get("actual_cash", 0))
+        variance    = actual_cash - float(cash_total)
+    
+    from apps.expenses.models import Expense
+    today_expenses = Expense.objects.filter(
+        branch=user.branch if not user.is_super_admin else None,
+        date=today
+    ) if not user.is_super_admin else Expense.objects.filter(date=today)
+    expense_total = today_expenses.aggregate(t=Sum("amount"))["t"] or 0
+    
+    return render(request, "sales/cash_reconciliation.html", {
+        "today": today,
+        "cash_total": cash_total,
+        "pos_total": pos_total,
+        "transfer_total": transfer_total,
+        "grand": grand,
+        "sales": sales,
+        "expense_total": expense_total,
+        "net": grand - expense_total,
+        "actual_cash": actual_cash,
+        "variance": variance,
+    })

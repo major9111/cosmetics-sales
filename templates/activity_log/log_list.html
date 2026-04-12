@@ -1,0 +1,24 @@
+{% extends "base/base.html" %}
+{% block title %}Activity Log{% endblock %}
+{% block page_title %}Login Activity Log{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>User</th><th>Action</th><th>IP Address</th><th>Time</th></tr></thead>
+      <tbody>
+      {% for log in logs %}
+      <tr>
+        <td><strong>{{ log.user.username|default:"—" }}</strong></td>
+        <td style="font-size:13px;">{{ log.action }}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">{{ log.ip_address|default:"—" }}</td>
+        <td style="color:var(--muted);font-size:12px;">{{ log.created_at|date:"d M Y H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" style="text-align:center;padding:32px;color:var(--muted);">No activity logged yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

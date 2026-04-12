@@ -1,0 +1,44 @@
+{% extends "base/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div style="max-width:560px;">
+  <div class="card">
+    <div class="card-title">{{ title }}</div>
+    <form method="post">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Supplier Name</label>
+          <input class="form-control" name="name" value="{{ supplier.name|default:'' }}" required placeholder="e.g. Beauty Wholesale Ltd"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Person</label>
+          <input class="form-control" name="contact_person" value="{{ supplier.contact_person|default:'' }}" placeholder="e.g. Musa Ibrahim"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-control" name="phone" value="{{ supplier.phone|default:'' }}" placeholder="0803 000 0000"/>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Email</label>
+          <input class="form-control" name="email" type="email" value="{{ supplier.email|default:'' }}"/>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Address</label>
+          <input class="form-control" name="address" value="{{ supplier.address|default:'' }}"/>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Notes</label>
+          <input class="form-control" name="notes" value="{{ supplier.notes|default:'' }}" placeholder="Any notes about this supplier..."/>
+        </div>
+      </div>
+      <hr class="divider"/>
+      <div style="display:flex;gap:10px;">
+        <button type="submit" class="btn btn-primary">Save Supplier</button>
+        <a href="{% url 'supplier_list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

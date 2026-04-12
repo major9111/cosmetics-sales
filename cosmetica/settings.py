@@ -33,6 +33,10 @@ INSTALLED_APPS = [
     'apps.stock',
     'apps.sales',
     'apps.ai_scanner',
+    'apps.suppliers',
+    'apps.expenses',
+    'apps.attendance',
+    'apps.activity_log',
 ]
 
 MIDDLEWARE = [
@@ -44,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.activity_log.middleware.ActivityLogMiddleware',
 ]
 
 ROOT_URLCONF = 'cosmetica.urls'

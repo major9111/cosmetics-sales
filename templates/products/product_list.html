@@ -2,6 +2,16 @@
 {% block title %}Products{% endblock %}
 {% block page_title %}Products{% endblock %}
 {% block topbar_actions %}
+  {% if not user.is_store_agent %}
+  <a href="{% url 'product_import' %}" class="btn btn-secondary">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Import CSV
+  </a>
+  <a href="{% url 'product_export' %}" class="btn btn-secondary">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Export CSV
+  </a>
+  {% endif %}
   <a href="{% url 'product_create' %}" class="btn btn-primary">+ Add Product</a>
 {% endblock %}
 {% block content %}

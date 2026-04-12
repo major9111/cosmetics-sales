@@ -1,0 +1,85 @@
+{% extends "base/base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block page_title %}Staff Attendance & Performance{% endblock %}
+{% block topbar_actions %}
+  {% if user.shift_set.filter.clock_out__isnull %}
+  {% endif %}
+  <a href="{% url 'clock_in' %}" class="btn btn-success">Clock In</a>
+  <a href="{% url 'clock_out' %}" class="btn btn-secondary">Clock Out</a>
+{% endblock %}
+{% block content %}
+
+<!-- Active Shifts -->
+{% if active_shifts %}
+<div class="card" style="margin-bottom:20px;border-color:var(--sage2);">
+  <div class="card-title" style="color:var(--sage2);">Currently Clocked In</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    {% for s in active_shifts %}
+    <div style="background:var(--bg);box-shadow:var(--neu-btn);border:1px solid rgba(86,196,148,0.3);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;">
+      <strong>{{ s.staff.get_full_name|default:s.staff.username }}</strong>
+      <div style="color:var(--muted);font-size:11px;">{{ s.branch.name }} · Since {{ s.clock_in|time:"H:i" }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Staff Performance This Month -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-title">Staff Performance — This Month</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Staff</th><th>Role</th><th>Branch</th><th>Sales Made</th><th>Revenue</th><th>Shifts</th></tr></thead>
+      <tbody>
+      {% for p in performance %}
+      <tr>
+        <td style="color:var(--muted);">{{ forloop.counter }}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--gold3);border:1px solid rgba(212,168,83,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gold);">
+              {{ p.staff.username|first|upper }}
+            </div>
+            <div>
+              <div style="font-weight:600;">{{ p.staff.get_full_name|default:p.staff.username }}</div>
+              <div style="font-size:11px;color:var(--muted);">{{ p.staff.username }}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="badge {% if p.staff.role == 'super_admin' %}badge-gold{% elif p.staff.role == 'branch_manager' %}badge-green{% elif p.staff.role == 'cashier' %}badge-blue{% else %}badge-gray{% endif %}">{{ p.staff.get_role_display }}</span></td>
+        <td style="font-size:12px;">{{ p.staff.branch.name|default:"All" }}</td>
+        <td style="font-weight:700;">{{ p.sales_count }}</td>
+        <td style="color:var(--gold);font-weight:700;">₦{{ p.sales_total|floatformat:0 }}</td>
+        <td style="color:var(--muted);">{{ p.shifts }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">No staff data yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Recent Shifts -->
+<div class="card">
+  <div class="card-title">Recent Shifts</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Staff</th><th>Branch</th><th>Clock In</th><th>Clock Out</th><th>Duration</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for s in shifts %}
+      <tr>
+        <td><strong>{{ s.staff.get_full_name|default:s.staff.username }}</strong></td>
+        <td style="color:var(--muted);font-size:12px;">{{ s.branch.name }}</td>
+        <td style="font-size:12px;">{{ s.clock_in|date:"d M Y H:i" }}</td>
+        <td style="font-size:12px;">{{ s.clock_out|date:"H:i"|default:"—" }}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">{% if s.duration_hours %}{{ s.duration_hours }}h{% else %}Active{% endif %}</td>
+        <td>{% if s.is_active %}<span class="badge badge-green">Active</span>{% else %}<span class="badge badge-gray">Done</span>{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted);">No shifts recorded yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
