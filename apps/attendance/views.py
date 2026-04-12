@@ -66,3 +66,61 @@ def clock_out(request):
     active.save()
     messages.success(request, f"Clocked out. Duration: {active.duration_hours} hours.")
     return redirect("attendance_list")
+
+
+@login_required
+def commission_report(request):
+    """Show commission earned by each staff this month."""
+    if not (request.user.is_super_admin or request.user.is_branch_manager):
+        from django.contrib import messages
+        messages.error(request, "Access denied.")
+        return redirect("dashboard")
+    from apps.accounts.models import User
+    from apps.sales.models import Sale
+    from django.db.models import Sum
+    from django.utils import timezone
+    from datetime import timedelta
+    from .models import CommissionRate
+    
+    today = timezone.now().date()
+    month_start = today.replace(day=1)
+    
+    staff = User.objects.filter(is_active=True).exclude(role="super_admin")
+    if not request.user.is_super_admin:
+        staff = staff.filter(branch=request.user.branch)
+    
+    data = []
+    for s in staff:
+        sales_total = Sale.objects.filter(
+            cashier=s, status="completed",
+            created_at__date__gte=month_start
+        ).aggregate(t=Sum("grand_total"))["t"] or 0
+        
+        try:
+            rate = CommissionRate.objects.get(staff=s).rate
+        except CommissionRate.DoesNotExist:
+            rate = 0
+        
+        commission = float(sales_total) * float(rate) / 100
+        data.append({
+            "staff": s, "sales_total": sales_total,
+            "rate": rate, "commission": commission
+        })
+    
+    # Handle rate update
+    if request.method == "POST":
+        staff_id = request.POST.get("staff_id")
+        rate = request.POST.get("rate", 0)
+        try:
+            s = User.objects.get(pk=staff_id)
+            CommissionRate.objects.update_or_create(staff=s, defaults={"rate": rate})
+            from django.contrib import messages
+            messages.success(request, f"Commission rate updated for {s.username}.")
+        except Exception:
+            pass
+        return redirect("commission_report")
+    
+    total_commission = sum(d["commission"] for d in data)
+    return render(request, "attendance/commission_report.html", {
+        "data": data, "month": month_start, "total_commission": total_commission
+    })
