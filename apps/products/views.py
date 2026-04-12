@@ -21,24 +21,15 @@ def product_create(request):
         return redirect('stock_list')
     categories = Category.objects.all()
     if request.method == 'POST':
-        from apps.suppliers.models import Supplier
         Product.objects.create(
             name=request.POST['name'],
             brand=request.POST.get('brand',''),
             cost_price=request.POST['cost_price'],
             selling_price=request.POST['selling_price'],
             category_id=request.POST.get('category') or None,
-            supplier_id=request.POST.get('supplier') or None,
-            expiry_date=request.POST.get('expiry_date') or None,
-            reorder_level=int(request.POST.get('reorder_level') or 10),
-            barcode=request.POST.get('barcode') or None,
-            description=request.POST.get('description',''),
         )
-        messages.success(request, 'Product added.')
         return redirect('product_list')
-    from apps.suppliers.models import Supplier
-    suppliers = Supplier.objects.filter(is_active=True)
-    return render(request, 'products/product_create.html', {'categories': categories, 'suppliers': suppliers})
+    return render(request, 'products/product_create.html', {'categories': categories})
 
 @login_required
 def product_detail(request, pk):
@@ -50,23 +41,13 @@ def product_edit(request, pk):
     product = get_object_or_404(Product, pk=pk)
     categories = Category.objects.all()
     if request.method == 'POST':
-        from apps.suppliers.models import Supplier
         product.name = request.POST['name']
         product.brand = request.POST.get('brand','')
         product.cost_price = request.POST['cost_price']
         product.selling_price = request.POST['selling_price']
-        product.category_id = request.POST.get('category') or None
-        product.supplier_id = request.POST.get('supplier') or None
-        product.expiry_date = request.POST.get('expiry_date') or None
-        product.reorder_level = int(request.POST.get('reorder_level') or 10)
-        product.barcode = request.POST.get('barcode') or None
-        product.description = request.POST.get('description','')
         product.save()
-        messages.success(request, 'Product updated.')
         return redirect('product_list')
-    from apps.suppliers.models import Supplier
-    suppliers = Supplier.objects.filter(is_active=True)
-    return render(request, 'products/product_edit.html', {'product': product, 'categories': categories, 'suppliers': suppliers})
+    return render(request, 'products/product_edit.html', {'product': product, 'categories': categories})
 
 
 @login_required
