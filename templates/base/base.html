@@ -604,6 +604,26 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+<script>
+// Poll notification count every 60 seconds
+async function updateNotifCount() {
+  try {
+    const r = await fetch("{% url 'notification_count' %}");
+    const d = await r.json();
+    const el = document.getElementById("notifCount");
+    if (el) {
+      if (d.count > 0) {
+        el.textContent = d.count > 9 ? "9+" : d.count;
+        el.style.display = "flex";
+      } else {
+        el.style.display = "none";
+      }
+    }
+  } catch(e) {}
+}
+updateNotifCount();
+setInterval(updateNotifCount, 60000);
+</script>
 {% block extra_scripts %}{% endblock %}
 </body>
 </html>

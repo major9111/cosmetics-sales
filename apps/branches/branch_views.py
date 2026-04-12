@@ -38,3 +38,25 @@ def branch_create(request):
 def branch_detail(request, pk):
     branch = get_object_or_404(Branch, pk=pk)
     return render(request, 'branches/branch_detail.html', {'branch': branch})
+
+
+@login_required
+def branch_edit(request, pk):
+    from django.contrib import messages
+    if not request.user.is_super_admin:
+        messages.error(request, "Only Super Admins can edit branches.")
+        return redirect("branch_list")
+    branch = get_object_or_404(Branch, pk=pk)
+    if request.method == "POST":
+        branch.name     = request.POST.get("name", "").strip()
+        branch.location = request.POST.get("location", "").strip()
+        branch.phone    = request.POST.get("phone", "").strip()
+        branch.email    = request.POST.get("email", "").strip()
+        branch.is_main  = request.POST.get("is_main") == "on"
+        branch.daily_target = request.POST.get("daily_target") or 0
+        if branch.is_main:
+            Branch.objects.exclude(pk=pk).update(is_main=False)
+        branch.save()
+        messages.success(request, f"Branch {branch.name} updated.")
+        return redirect("branch_list")
+    return render(request, "branches/branch_edit.html", {"branch": branch})

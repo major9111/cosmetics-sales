@@ -33,6 +33,7 @@
     </div>
     <div style="display:flex;gap:8px;">
       <a href="{% url 'branch_detail' branch.pk %}" class="btn btn-secondary btn-sm" style="flex:1;text-align:center;">View Detail</a>
+      {% if user.is_super_admin %}<a href="{% url 'branch_edit' branch.pk %}" class="btn btn-secondary btn-sm">Edit</a>{% endif %}
       <a href="{% url 'stock_list' %}?branch={{ branch.pk }}" class="btn btn-secondary btn-sm">Stock</a>
     </div>
   </div>

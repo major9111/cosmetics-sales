@@ -1,0 +1,44 @@
+{% extends "base/base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+{% block topbar_actions %}
+  <form method="post" action="{% url 'notification_clear' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-secondary" onclick="return confirm('Clear all notifications?')">Clear All</button>
+  </form>
+{% endblock %}
+{% block content %}
+<div style="max-width:700px;">
+  {% for n in notifications %}
+  <div class="card" style="margin-bottom:12px;border-left:3px solid
+    {% if n.type == 'low_stock' or n.type == 'reorder' %}var(--gold)
+    {% elif n.type == 'expiry' %}var(--rose)
+    {% elif n.type == 'sale_void' or n.type == 'sale_refund' %}var(--sage2)
+    {% else %}var(--border){% endif %};">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">{{ n.title }}</div>
+        <div style="font-size:13px;color:var(--text2);">{{ n.message }}</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap;">{{ n.created_at|date:"d M H:i" }}</div>
+    </div>
+    <div style="margin-top:8px;">
+      <span class="badge
+        {% if n.type == 'low_stock' or n.type == 'reorder' %}badge-gold
+        {% elif n.type == 'expiry' %}badge-red
+        {% else %}badge-gray{% endif %}">
+        {{ n.get_type_display }}
+      </span>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </div>
+    <strong>No notifications</strong>
+    <p>You're all caught up!</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

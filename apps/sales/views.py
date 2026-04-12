@@ -110,6 +110,11 @@ def sale_void(request, pk):
             sale.status = 'voided'
             sale.save()
         messages.success(request, f'Sale {sale.receipt_no} has been voided and stock restored.')
+        try:
+            from apps.notifications.utils import notify_managers
+            notify_managers(sale.branch, f"Sale Voided: {sale.receipt_no}",
+                f"Sale {sale.receipt_no} (₦{sale.grand_total}) was voided by {request.user.username}.", "sale_void")
+        except Exception: pass
         return redirect('sale_detail', pk=pk)
     return render(request, 'sales/sale_void_confirm.html', {'sale': sale})
 
@@ -140,6 +145,11 @@ def sale_refund(request, pk):
             sale.status = 'refunded'
             sale.save()
         messages.success(request, f'Sale {sale.receipt_no} refunded and stock restored.')
+        try:
+            from apps.notifications.utils import notify_managers
+            notify_managers(sale.branch, f"Refund: {sale.receipt_no}",
+                f"Sale {sale.receipt_no} (₦{sale.grand_total}) was refunded by {request.user.username}.", "sale_refund")
+        except Exception: pass
         return redirect('sale_detail', pk=pk)
     return render(request, 'sales/sale_refund_confirm.html', {'sale': sale})
 
