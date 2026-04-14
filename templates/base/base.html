@@ -608,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Poll notification count every 60 seconds
 async function updateNotifCount() {
   try {
-    const r = await fetch("{% url 'notification_count' %}");
+    const r = await fetch("/notifications/count/");
     const d = await r.json();
     const el = document.getElementById("notifCount");
     if (el) {

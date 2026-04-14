@@ -29,9 +29,9 @@ def product_create(request):
             selling_price=request.POST['selling_price'],
             category_id=request.POST.get('category') or None,
             supplier_id=request.POST.get('supplier') or None,
-            expiry_date=request.POST.get('expiry_date') or None,
-            reorder_level=int(request.POST.get('reorder_level') or 10),
-            barcode=request.POST.get('barcode') or None,
+            # expiry_date=request.POST.get('expiry_date') or None,  # Added in batch2
+            # reorder_level=int(request.POST.get('reorder_level') or 10),  # Added in batch2
+            # barcode=request.POST.get('barcode') or None,
             description=request.POST.get('description',''),
         )
         messages.success(request, 'Product added.')
@@ -57,9 +57,6 @@ def product_edit(request, pk):
         product.selling_price = request.POST['selling_price']
         product.category_id = request.POST.get('category') or None
         product.supplier_id = request.POST.get('supplier') or None
-        product.expiry_date = request.POST.get('expiry_date') or None
-        product.reorder_level = int(request.POST.get('reorder_level') or 10)
-        product.barcode = request.POST.get('barcode') or None
         product.description = request.POST.get('description','')
         product.save()
         messages.success(request, 'Product updated.')

@@ -9,9 +9,7 @@ def redirect_home(request):
         return redirect('dashboard')
     return redirect('login')
 
-@login_required
-def profile(request):
-    return render(request, 'accounts/profile.html', {'user': request.user})
+
 
 @login_required
 def user_list(request):

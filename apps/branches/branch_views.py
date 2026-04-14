@@ -53,7 +53,6 @@ def branch_edit(request, pk):
         branch.phone    = request.POST.get("phone", "").strip()
         branch.email    = request.POST.get("email", "").strip()
         branch.is_main  = request.POST.get("is_main") == "on"
-        branch.daily_target = request.POST.get("daily_target") or 0
         if branch.is_main:
             Branch.objects.exclude(pk=pk).update(is_main=False)
         branch.save()

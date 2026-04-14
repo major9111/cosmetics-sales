@@ -74,6 +74,7 @@ def dashboard(request):
                 'today': float(b_sales.filter(created_at__date=today).aggregate(t=Sum('grand_total'))['t'] or 0),
                 'month': float(b_sales.filter(created_at__date__gte=month_ago).aggregate(t=Sum('grand_total'))['t'] or 0),
                 'low_stock': Stock.objects.filter(branch=branch, quantity__lte=F('low_stock_threshold')).count(),
+
             })
 
     # ── Recent sales ──────────────────────────────────────────────────────────

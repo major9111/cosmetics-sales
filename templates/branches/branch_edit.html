@@ -23,12 +23,7 @@
         <label class="form-label">Email</label>
         <input class="form-control" name="email" type="email" value="{{ branch.email }}"/>
       </div>
-      <div class="form-group">
-        <label class="form-label">Daily Sales Target (₦)</label>
-        <input class="form-control" name="daily_target" type="number" step="0.01" min="0"
-          value="{{ branch.daily_target }}" placeholder="0 = no target"/>
-      </div>
-      <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+<div class="form-group" style="display:flex;align-items:center;gap:10px;">
         <input type="checkbox" name="is_main" id="isMain" style="width:auto;"
           {% if branch.is_main %}checked{% endif %}/>
         <label for="isMain" style="font-size:13px;color:var(--text);margin:0;">This is the main store / head office</label>
