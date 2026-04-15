@@ -25,15 +25,6 @@ class Product(models.Model):
     cost_price    = models.DecimalField(max_digits=10, decimal_places=2)
     selling_price = models.DecimalField(max_digits=10, decimal_places=2)
 
-    supplier    = models.ForeignKey(
-        'suppliers.Supplier',
-        on_delete=models.SET_NULL,
-        null=True, blank=True,
-        related_name='products'
-    )
-    expiry_date  = models.DateField(null=True, blank=True)
-    reorder_level = models.PositiveIntegerField(default=10)
-
     # AI-assisted flag
     ai_detected  = models.BooleanField(default=False)
     ai_confidence = models.FloatField(null=True, blank=True)
